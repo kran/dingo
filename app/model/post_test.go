@@ -155,9 +155,17 @@ func TestPost(t *testing.T) {
 				So(err, ShouldBeNil)
 			})
 
-			Convey("Get all posts list", func() {
+			Convey("Get all published posts list", func() {
 				posts := new(Posts)
-				err := posts.GetAllPostList(false, false, "created_at")
+				err := posts.GetAllPostList(false, true, "created_at")
+
+				So(posts, ShouldHaveLength, 1)
+				So(err, ShouldBeNil)
+			})
+
+			Convey("Get all unpublished posts list", func() {
+				posts := new(Posts)
+				err := posts.GetAllPostList(false, true, "created_at")
 
 				So(posts, ShouldHaveLength, 1)
 				So(err, ShouldBeNil)

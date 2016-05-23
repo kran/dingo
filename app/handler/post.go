@@ -94,6 +94,25 @@ func APIPostSlugHandler(ctx *golf.Context) {
 // APIPostsHandler gets every page, ordered by publication date.
 func APIPostsHandler(ctx *golf.Context) {
 	posts := new(model.Posts)
+	switch limitPublixhed := ctx.Param("published") {
+	case "true":
+		pubPosts := posts.GetAllPostList(false, true, "published_at DESC")
+		posts.AppendPosts(pubPosts)
+	case "false":
+		unpubPosts := posts.GetAllPostList(false, false, "created_at DESC")
+		posts.AppendPosts(unpubPosts)
+	default:
+		pubPosts := posts.GetAllPostList(false, true, "published_at DESC")
+		posts.AppendPosts(pubPosts)
+		unpubPosts := posts.GetAllPostList(false, false, "created_at DESC")
+		posts.AppendPosts(unpubPosts)
+	}
+	ctx.JSON(NewAPISuccessResponse(posts))
+	limitPublished, convErr := strconv.ParseBool(limitPublished)
+	if convErr != nil {
+		handleErr(ctx, 500, convErr)
+		return
+	}
 	err := posts.GetAllPostList(false, true, "published_at DESC")
 	if err != nil {
 		handleErr(ctx, 404, err)
