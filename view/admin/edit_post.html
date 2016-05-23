@@ -43,6 +43,13 @@
                 </div>
 
                 <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                    <input class="mdl-textfield__input" type="text" name="image" id="image" value="{{ .Post.Image }}">
+                    <label class="mdl-textfield__label" for="image">Cover Image</label>
+                  </div>
+                </div>
+
+                <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
                   <textarea name="content" id="content" class="ipt">{{Html .Post.Markdown}}</textarea>
                 </div>
 
