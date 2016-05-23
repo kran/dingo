@@ -156,7 +156,7 @@ func TestUserLogInWithCorrectInformation(t *testing.T) {
 
 					w := httptest.NewRecorder()
 					app := golf.New()
-					app = Initialize(app)
+					app = InitTestApp(app)
 
 					req := makeTestHTTPRequest(nil, "GET", "/admin/")
 					req.Header = http.Header{"Cookie": rec.HeaderMap["Set-Cookie"]}
