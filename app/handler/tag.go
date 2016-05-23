@@ -7,15 +7,20 @@ import (
 	"github.com/dingoblog/dingo/app/model"
 )
 
-func registerTagHandlers(app *golf.Application) {
+func registerTagHandlers(app *golf.Application, routes map[string]map[string]interface{}) {
 	app.Get("/api/tags", APITagsHandler)
-	app.Get("/api/tags/:id", APITagHandler)
+	routes["GET"]["tags_url"] = "/api/tags"
+
+	app.Get("/api/tags/:tag_id", APITagHandler)
+	routes["GET"]["tag_url"] = "/api/tags/:tag_id"
+
 	app.Get("/api/tags/slug/:slug", APITagSlugHandler)
+	routes["GET"]["tag_slug_url"] = "/api/tags/:slug"
 }
 
 // APITagHandler retrieves the tag with the given id.
 func APITagHandler(ctx *golf.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := strconv.Atoi(ctx.Param("tag_id"))
 	if err != nil {
 		handleErr(ctx, 500, err)
 		return

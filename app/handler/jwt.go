@@ -16,11 +16,14 @@ type JWTPostBody struct {
 	Password string `json:"password"`
 }
 
-func registerJWTHandlers(app *golf.Application) {
+func registerJWTHandlers(app *golf.Application, routes map[string]map[string]interface{}) {
 	adminChain := golf.NewChain(JWTAuthMiddleware)
 	// Auth
 	app.Post("/auth", JWTAuthLoginHandler)
+	routes["POST"]["auth_new_url"] = "/auth"
+
 	app.Get("/auth", adminChain.Final(JWTDecryptHandler))
+	routes["GET"]["auth_decrypt_url"] = "/auth"
 }
 
 func JWTAuthLoginHandler(ctx *golf.Context) {

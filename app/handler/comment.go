@@ -7,15 +7,20 @@ import (
 	"github.com/dingoblog/dingo/app/model"
 )
 
-func registerCommentsHandlers(app *golf.Application) {
+func registerCommentsHandlers(app *golf.Application, routes map[string]map[string]interface{}) {
 	app.Get("/api/comments", APICommentsHandler)
-	app.Get("/api/comments/:id", APICommentHandler)
-	app.Get("/api/comments/post/:id", APICommentPostHandler)
+	routes["GET"]["comments_url"] = "/api/comments"
+
+	app.Get("/api/comments/:comment_id", APICommentHandler)
+	routes["GET"]["comment_url"] = "/api/comments/:comment_id"
+
+	app.Get("/api/comments/post/:post_id", APICommentPostHandler) // This can be removed. Use /api/posts/:post_id/comments instead.
+	routes["GET"]["comment_post_url"] = "/api/comments/post/:post_id"
 }
 
 // APICommentHandler retrieves a comment with the given comment id.
 func APICommentHandler(ctx *golf.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := strconv.Atoi(ctx.Param("comment_id"))
 	if err != nil {
 		handleErr(ctx, 500, err)
 		return
@@ -31,7 +36,7 @@ func APICommentHandler(ctx *golf.Context) {
 
 // APICommentPostHandler retrives the tag with the given post id.
 func APICommentPostHandler(ctx *golf.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := strconv.Atoi(ctx.Param("post_id"))
 	if err != nil {
 		handleErr(ctx, 500, err)
 		return
