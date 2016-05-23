@@ -42,7 +42,7 @@ func NewAPISuccessResponse(data interface{}, msgs ...string) APIResponseBodyJSON
 func APIDocumentationHandler(routes map[string]map[string]interface{}) golf.HandlerFunc {
 	return func(ctx *golf.Context) {
 		routes["GET"]["api_documentation_url"] = "/api"
-		ctx.JSONIndent(routes, "", "  ")
+		ctx.JSONIndent(map[string]interface{}{"request_method": routes}, "", "  ")
 	}
 }
 
