@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 	"strings"
 	"time"
@@ -224,19 +223,13 @@ func (p *Post) UpdateFromRequest(r *http.Request) {
 	p.IsPublished = r.FormValue("status") == "on"
 }
 
-func (p *Post) UpdateFromRequestJSON(r *http.Request) {
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
+func (p *Post) UpdateFromJSON(j []byte) error {
+	err := json.Unmarshal(j, p)
 	if err != nil {
-		utils.LogOnError(err, "Unable to update post from request JSON.", true)
-		return
-	}
-	err = json.Unmarshal(body, p)
-	if err != nil {
-		utils.LogOnError(err, "Unable to update post from request JSON.", true)
-		return
+		return err
 	}
 	p.Html = utils.Markdown2Html(p.Markdown)
+	return nil
 }
 
 func (p *Post) Publish(by int64) error {

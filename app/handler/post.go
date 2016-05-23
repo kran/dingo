@@ -6,6 +6,8 @@ import (
 
 	"github.com/dinever/golf"
 	"github.com/dingoblog/dingo/app/model"
+	"io/ioutil"
+	"github.com/dingoblog/dingo/app/utils"
 )
 
 func registerPostHandlers(app *golf.Application, routes map[string]map[string]interface{}) {
@@ -164,15 +166,20 @@ func APIPostSaveHandler(ctx *golf.Context) {
 		ctx.SendStatus(http.StatusInternalServerError)
 		return
 	}
-	user := &model.User{Id: token.(model.JWT).UserID}
-	err = user.GetUserById()
+	post := model.NewPost()
+	post.CreatedBy = token.(model.JWT).UserID
+	defer ctx.Request.Body.Close()
+	body, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
-		ctx.SendStatus(http.StatusNotFound)
+		utils.LogOnError(err, "Unable to update post from request JSON.", true)
+		return
+	}
+	err = post.UpdateFromJSON(body)
+	if err != nil {
+		ctx.SendStatus(http.StatusInternalServerError)
 		ctx.JSON(APIResponseBodyJSON{Data: nil, Status: NewErrorStatusJSON(err.Error())})
 		return
 	}
-	post := model.NewPost()
-	post.UpdateFromRequestJSON(ctx.Request)
 	err = post.Save(post.Tags()...)
 	if err != nil {
 		ctx.SendStatus(http.StatusInternalServerError)
@@ -187,13 +194,6 @@ func APIPostPublishHandler(ctx *golf.Context) {
 	token, err := ctx.Session.Get("jwt")
 	if err != nil {
 		ctx.SendStatus(http.StatusInternalServerError)
-		return
-	}
-	user := &model.User{Id: token.(model.JWT).UserID}
-	err = user.GetUserById()
-	if err != nil {
-		ctx.SendStatus(http.StatusNotFound)
-		ctx.JSON(APIResponseBodyJSON{Data: nil, Status: NewErrorStatusJSON(err.Error())})
 		return
 	}
 	post := getPostFromContext(ctx)
