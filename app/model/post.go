@@ -2,8 +2,9 @@ package model
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"strconv"
 	"strings"
 	"time"
@@ -35,26 +36,26 @@ var safeOrderByStmt = map[string]string{
 }
 
 type Post struct {
-	Id              int64      `meddler:"id,pk"`
-	Title           string     `meddler:"title"`
-	Slug            string     `meddler:"slug"`
-	Markdown        string     `meddler:"markdown"`
-	Html            string     `meddler:"html"`
-	Image           string     `meddler:"image"`
-	IsFeatured      bool       `meddler:"featured"`
-	IsPage          bool       `meddler:"page"`
-	AllowComment    bool       `meddler:"allow_comment"`
-	CommentNum      int64      `meddler:"comment_num"`
-	IsPublished     bool       `meddler:"published"`
-	Language        string     `meddler:"language"`
-	MetaTitle       string     `meddler:"meta_title"`
-	MetaDescription string     `meddler:"meta_description"`
-	CreatedAt       *time.Time `meddler:"created_at"`
-	CreatedBy       int64      `meddler:"created_by"`
-	UpdatedAt       *time.Time `meddler:"updated_at"`
-	UpdatedBy       int64      `meddler:"updated_by"`
-	PublishedAt     *time.Time `meddler:"published_at"`
-	PublishedBy     int64      `meddler:"published_by"`
+	Id              int64      `meddler:"id,pk",json:"id"`
+	Title           string     `meddler:"title",json:"title"`
+	Slug            string     `meddler:"slug",json:"slug"`
+	Markdown        string     `meddler:"markdown",json:"markdown"`
+	Html            string     `meddler:"html",json:"html"`
+	Image           string     `meddler:"image",json:"image"`
+	IsFeatured      bool       `meddler:"featured",json:"featured"`
+	IsPage          bool       `meddler:"page",json:"is_page"` // Using "is_page" instead of "page" since nouns are generally non-bools
+	AllowComment    bool       `meddler:"allow_comment",json:"allow_comment"`
+	CommentNum      int64      `meddler:"comment_num",json:"comment_num"`
+	IsPublished     bool       `meddler:"published",json:"published"`
+	Language        string     `meddler:"language",json:"language"`
+	MetaTitle       string     `meddler:"meta_title",json:"meta_title"`
+	MetaDescription string     `meddler:"meta_description",json:"meta_description"`
+	CreatedAt       *time.Time `meddler:"created_at",json:"created_at"`
+	CreatedBy       int64      `meddler:"created_by",json:"created_by"`
+	UpdatedAt       *time.Time `meddler:"updated_at",json:"updated_at"`
+	UpdatedBy       int64      `meddler:"updated_by",json:"updated_by"`
+	PublishedAt     *time.Time `meddler:"published_at",json:"published_at"`
+	PublishedBy     int64      `meddler:"published_by",json:"published_by"`
 	Hits            int64      `meddler:"-"`
 	Category        string     `meddler:"-"`
 }
@@ -223,6 +224,29 @@ func (p *Post) UpdateFromRequest(r *http.Request) {
 	p.IsPublished = r.FormValue("status") == "on"
 }
 
+func (p *Post) UpdateFromRequestJSON(r *http.Request) {
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		utils.LogOnError(err, "Unable to update post from request JSON.", true)
+		return
+	}
+	err = json.Unmarshal(body, p)
+	if err != nil {
+		utils.LogOnError(err, "Unable to update post from request JSON.", true)
+		return
+	}
+	p.Html = utils.Markdown2Html(p.Markdown)
+}
+
+func (p *Post) Publish(by int64) error {
+	p.PublishedAt = utils.Now()
+	p.PublishedBy = by
+	p.IsPublished = true
+	err := meddler.Update(db, "posts", p)
+	return err
+}
+
 func DeletePostTagsByPostId(post_id int64) error {
 	writeDB, err := db.Begin()
 	if err != nil {
@@ -259,8 +283,14 @@ func DeletePostById(id int64) error {
 	return DeleteOldTags()
 }
 
-func (post *Post) GetPostById() error {
-	err := meddler.QueryRow(db, post, stmtGetPostById, post.Id)
+func (post *Post) GetPostById(id ...int64) error {
+	var postId int64
+	if len(id) == 0 {
+		postId = post.Id
+	} else {
+		postId = id[0]
+	}
+	err := meddler.QueryRow(db, post, stmtGetPostById, postId)
 	return err
 }
 
@@ -277,7 +307,7 @@ func (posts *Posts) GetPostsByTag(tagId, page, size int64, onlyPublished bool) (
 	row := db.QueryRow(stmtGetPostsCountByTag, tagId)
 	err := row.Scan(&count)
 	if err != nil {
-		log.Printf("[Error]: ", err.Error())
+		utils.LogOnError(err, "Unable to get posts by tag.", true)
 		return nil, err
 	}
 	pager = utils.NewPager(page, size, count)
@@ -350,7 +380,7 @@ func (posts *Posts) GetAllPostList(isPage bool, onlyPublished bool, orderBy stri
 		where = `page = 0`
 	}
 	if onlyPublished {
-		where = where + `AND published`
+		where = where + ` AND published`
 	}
 	safeOrderBy := getSafeOrderByStmt(orderBy)
 	err := meddler.QueryAll(db, posts, fmt.Sprintf(stmtGetAllPostList, where, safeOrderBy))

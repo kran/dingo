@@ -22,7 +22,8 @@ func authenticatedContext(form url.Values, method, path string) *golf.Context {
 	ctx.App.ServeHTTP(ctx.Response, ctx.Request)
 	rec := ctx.Response.(*httptest.ResponseRecorder)
 	w := httptest.NewRecorder()
-	app := InitTestApp()
+	app := golf.New()
+	app = InitTestApp(app)
 	req := makeTestHTTPRequest(strings.NewReader(form.Encode()), method, path)
 	req.Header = http.Header{"Cookie": rec.HeaderMap["Set-Cookie"]}
 	req.PostForm = form

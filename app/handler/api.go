@@ -1,198 +1,49 @@
 package handler
 
 import (
+	"encoding/json"
+	"strings"
+
 	"github.com/dinever/golf"
-	"github.com/dingoblog/dingo/app/model"
-	"strconv"
+	"github.com/dingoblog/dingo/app/utils"
 )
+
+type APISerializeable interface {
+	Serialize() []byte
+}
+
+type APIStatusJSON struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
+type APIResponseBodyJSON struct {
+	Data   interface{}   `json:"data"`
+	Status APIStatusJSON `json:"status"`
+}
+
+func NewErrorStatusJSON(msgs ...string) APIStatusJSON {
+	msg := strings.Join(msgs, " ")
+	return APIStatusJSON{Status: "error", Message: msg}
+}
+
+func NewSuccessStatusJSON(msgs ...string) APIStatusJSON {
+	msg := strings.Join(msgs, " ")
+	return APIStatusJSON{Status: "success", Message: msg}
+}
+
+func NewAPISuccessResponse(data interface{}, msgs ...string) APIResponseBodyJSON {
+	status := NewSuccessStatusJSON(msgs...)
+	return APIResponseBodyJSON{Data: data, Status: status}
+}
 
 // APIDocumentationHandler shows which routes match with what functionality,
 // similar to https://api.github.com
-func APIDocumentationHandler(ctx *golf.Context) {
-	// Go doesn't display maps in the order they appear here, so if the order
-	// of these routes is important, it might be better to use a struct
-	routes := map[string]interface{}{
-		"auth_url":              "/auth/",
-		"api_documentation_url": "/api/",
-		"comments_url":          "/api/comments",
-		"comment_url":           "/api/comments/:id",
-		"comment_post_url":      "/api/comments/post/:id",
-		"posts_url":             "/api/posts/",
-		"post_url":              "/api/posts/:id",
-		"post_slug_url":         "/api/posts/slug/:slug",
-		"tags_url":              "/api/tags/",
-		"tag_url":               "/api/tags/:id",
-		"tag_slug_url":          "/api/tags/slug/:slug",
-		"users_url":             "/api/users/",
-		"user_url":              "/api/users/:id",
-		"user_slug_url":         "/api/users/slug/:slug",
-		"user_email_url":        "/api/users/email/:email",
+func APIDocumentationHandler(routes map[string]map[string]interface{}) golf.HandlerFunc {
+	return func(ctx *golf.Context) {
+		routes["GET"]["api_documentation_url"] = "/api"
+		ctx.JSONIndent(routes, "", "  ")
 	}
-	ctx.JSONIndent(routes, "", "  ")
-}
-
-// APICommentsHandler retrieves all the comments.
-func APICommentsHandler(ctx *golf.Context) {
-	ctx.JSONIndent(map[string]interface{}{
-		"message": "Not implemented",
-	}, "", "  ")
-}
-
-// APICommentHandler retrieves a comment with the given comment id.
-func APICommentHandler(ctx *golf.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		handleErr(ctx, 500, err)
-		return
-	}
-	comment := &model.Comment{Id: int64(id)}
-	err = comment.GetCommentById()
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(comment, "", "  ")
-}
-
-// APICommentPostHandler retrives the tag with the given post id.
-func APICommentPostHandler(ctx *golf.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		handleErr(ctx, 500, err)
-		return
-	}
-	comments := new(model.Comments)
-	err = comments.GetCommentsByPostId(int64(id))
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(comments, "", "  ")
-}
-
-// APIPostsHandler gets every page, ordered by publication date.
-func APIPostsHandler(ctx *golf.Context) {
-	posts := new(model.Posts)
-	err := posts.GetAllPostList(false, true, "published_at DESC")
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(posts, "", "  ")
-}
-
-// APIPostHandler retrieves the post with the given ID.
-func APIPostHandler(ctx *golf.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		handleErr(ctx, 500, err)
-		return
-	}
-	post := &model.Post{Id: int64(id)}
-	err = post.GetPostById()
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(post, "", "  ")
-}
-
-// APIPostSlugHandler retrieves the post with the given slug.
-func APIPostSlugHandler(ctx *golf.Context) {
-	slug := ctx.Param("slug")
-	post := new(model.Post)
-	err := post.GetPostBySlug(slug)
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(post, "", "  ")
-}
-
-// APITagsHandler retrieves all the tags.
-func APITagsHandler(ctx *golf.Context) {
-	tags := new(model.Tags)
-	err := tags.GetAllTags()
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(tags, "", "  ")
-}
-
-// APITagHandler retrieves the tag with the given id.
-func APITagHandler(ctx *golf.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		handleErr(ctx, 500, err)
-		return
-	}
-	tag := &model.Tag{Id: int64(id)}
-	err = tag.GetTag()
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(tag, "", "  ")
-}
-
-// APITagSlugHandler retrieves the tag(s) with the given slug.
-func APITagSlugHandler(ctx *golf.Context) {
-	slug := ctx.Param("slug")
-	tags := &model.Tag{Slug: slug}
-	err := tags.GetTagBySlug()
-	if err != nil {
-		handleErr(ctx, 500, err)
-		return
-	}
-	ctx.JSONIndent(tags, "", "  ")
-}
-
-// APIUsersHandler retrieves all users.
-func APIUsersHandler(ctx *golf.Context) {
-	ctx.JSONIndent(map[string]interface{}{
-		"message": "Not implemented",
-	}, "", "  ")
-}
-
-// APIUserHandler retrieves the user with the given id.
-func APIUserHandler(ctx *golf.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		handleErr(ctx, 500, err)
-		return
-	}
-	user := &model.User{Id: int64(id)}
-	err = user.GetUserById()
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(user, "", "  ")
-}
-
-// APIUserSlugHandler retrives the user with the given slug.
-func APIUserSlugHandler(ctx *golf.Context) {
-	slug := ctx.Param("slug")
-	user := &model.User{Slug: slug}
-	err := user.GetUserBySlug()
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(user, "", "  ")
-}
-
-// APIUserEmailHandler retrieves the user with the given email.
-func APIUserEmailHandler(ctx *golf.Context) {
-	email := ctx.Param("email")
-	user := &model.User{Email: email}
-	err := user.GetUserByEmail()
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSONIndent(user, "", "  ")
 }
 
 // handleErr sends the staus code and error message formatted as JSON.
@@ -201,4 +52,22 @@ func handleErr(ctx *golf.Context, statusCode int, err error) {
 		"statusCode": statusCode,
 		"error":      err.Error(),
 	}, "", "  ")
+}
+
+func (status APIStatusJSON) Serialize() []byte {
+	serializedStatus, err := json.Marshal(status)
+	if err != nil {
+		utils.LogOnError(err, "Unable to serialize status.", true)
+		return []byte("")
+	}
+	return serializedStatus
+}
+
+func (body APIResponseBodyJSON) Serialize() []byte {
+	serializedBody, err := json.Marshal(body)
+	if err != nil {
+		utils.LogOnError(err, "Unable to serialize response body.", true)
+		return []byte("")
+	}
+	return serializedBody
 }

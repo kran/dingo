@@ -16,6 +16,16 @@ type JWTPostBody struct {
 	Password string `json:"password"`
 }
 
+func registerJWTHandlers(app *golf.Application, routes map[string]map[string]interface{}) {
+	adminChain := golf.NewChain(JWTAuthMiddleware)
+	// Auth
+	app.Post("/auth", JWTAuthLoginHandler)
+	routes["POST"]["auth_new_url"] = "/auth"
+
+	app.Get("/auth", adminChain.Final(JWTDecryptHandler))
+	routes["GET"]["auth_decrypt_url"] = "/auth"
+}
+
 func JWTAuthLoginHandler(ctx *golf.Context) {
 	var email string
 	var password string
@@ -67,22 +77,15 @@ func JWTAuthLoginHandler(ctx *golf.Context) {
 	ctx.JSON(token)
 }
 
-func JWTAuthValidateHandler(ctx *golf.Context) {
-	tokenHeader := ctx.Header("X-SESSION-TOKEN")
-	ctx.SetHeader("Content-Type", "application/json")
-	if tokenHeader == "" {
-		ctx.SendStatus(http.StatusBadRequest)
-		ctx.JSON(map[string]interface{}{"status": "error"})
-		return
+func JWTDecryptHandler(ctx *golf.Context) {
+	if ctx.Header("Content-Type") != "application/json" {
+		ctx.SetHeader("Content-Type", "application/json")
 	}
-
-	token, err := model.ValidateJWT(tokenHeader)
+	token, err := ctx.Session.Get("jwt")
 	if err != nil {
-		ctx.SendStatus(http.StatusUnauthorized)
-		ctx.JSON(map[string]interface{}{"status": "error"})
+		ctx.SendStatus(http.StatusInternalServerError)
 		return
 	}
-
 	ctx.SendStatus(http.StatusOK)
-	ctx.JSON(model.NewJWTFromToken(token))
+	ctx.JSON(token)
 }
