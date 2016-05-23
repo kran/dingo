@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"github.com/dinever/golf"
 	"github.com/dingoblog/dingo/app/model"
-	"io/ioutil"
 	"github.com/dingoblog/dingo/app/utils"
 )
 
@@ -44,6 +44,9 @@ func registerPostHandlers(app *golf.Application, routes map[string]map[string]in
 
 	app.Post("/api/posts/:post_id/publish", adminChain.Final(APIPostPublishHandler))
 	routes["POST"]["post_publish_url"] = "/api/posts/:post_id/publish"
+
+	app.Delete("/api/posts/:post_id", adminChain.Final(APIPostDeleteHandler))
+	routes["DELETE"]["post_delete_url"] = "/api/posts/:post_id"
 }
 
 func getPostFromContext(ctx *golf.Context, param ...string) (post *model.Post) {
@@ -198,13 +201,29 @@ func APIPostPublishHandler(ctx *golf.Context) {
 	}
 	post := getPostFromContext(ctx)
 	if post == nil {
+		ctx.SendStatus(http.StatusNotFound)
 		return
 	}
 	err = post.Publish(token.(model.JWT).UserID)
 	if err != nil {
-		ctx.SendStatus(http.StatusNotFound)
+		ctx.SendStatus(http.StatusInternalServerError)
 		ctx.JSON(APIResponseBodyJSON{Data: nil, Status: NewErrorStatusJSON(err.Error())})
 		return
 	}
 	ctx.JSON(NewAPISuccessResponse(post))
+}
+
+// APIPostDeleteHandler deletes the post referenced by the post_id.
+func APIPostDeleteHandler(ctx *golf.Context) {
+	post := getPostFromContext(ctx)
+	if post == nil {
+		ctx.SendStatus(http.StatusNotFound)
+		return
+	}
+	err := model.DeletePostById(post.Id)
+	if err != nil {
+		ctx.SendStatus(http.StatusInternalServerError)
+		ctx.JSON(APIResponseBodyJSON{Data: nil, Status: NewErrorStatusJSON(err.Error())})
+		return
+	}
 }
