@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/dinever/golf"
 	"github.com/dingoblog/dingo/app/handler"
 	"github.com/dingoblog/dingo/app/model"
 )
@@ -23,7 +24,8 @@ func Init(dbPath, privKey, pubKey string) {
 }
 
 func Run(portNumber string) {
-	app := handler.Initialize()
+	app := golf.New()
+	app = handler.Initialize(app)
 	fmt.Printf("Application Started on port %s\n", portNumber)
 	app.Run(":" + portNumber)
 }
