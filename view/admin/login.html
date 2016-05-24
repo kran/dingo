@@ -42,9 +42,11 @@
                 <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect mdl-color--light-blue">
                   Login
                 </button>
+								{{ if not .UserExists }}
                 <a href="/signup" class="mdl-button mdl-js-button mdl-js-ripple-effect">
                   Sign up
                 </a>
+								{{ end }}
               </div>
 
             </form>
