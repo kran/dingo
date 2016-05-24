@@ -1,3 +1,9 @@
+# dingo stuff
+dingo
+dingo.db
+dingo.rsa
+dingo.rsa.pub
+
 .DS_Store
 .AppleDouble
 .LSOverride

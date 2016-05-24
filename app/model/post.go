@@ -352,7 +352,7 @@ func (posts *Posts) GetAllPostList(isPage bool, onlyPublished bool, orderBy stri
 		where = `page = 0`
 	}
 	if onlyPublished {
-		where = where + `AND published`
+		where = where + ` AND published`
 	}
 	safeOrderBy := getSafeOrderByStmt(orderBy)
 	err := meddler.QueryAll(db, posts, fmt.Sprintf(stmtGetAllPostList, where, safeOrderBy))

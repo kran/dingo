@@ -9,17 +9,13 @@ import (
 	"github.com/dingoblog/dingo/app/utils"
 )
 
-var app *golf.Application
-
-func Initialize() *golf.Application {
-	app = golf.New()
-
+func Initialize(app *golf.Application) *golf.Application {
 	app.Config.Set("app/static_dir", "static")
 	app.Config.Set("app.log_dir", "tmp/log")
 	app.Config.Set("app/upload_dir", "upload")
 	upload_dir, _ := app.Config.GetString("app/upload_dir", "upload")
-	registerMiddlewares()
-	registerFuncMap()
+	registerMiddlewares(app)
+	registerFuncMap(app)
 	RegisterFunctions(app)
 	theme := model.GetSettingValue("theme")
 	app.View.SetTemplateLoader("base", "view")
@@ -33,14 +29,14 @@ func Initialize() *golf.Application {
 	app.SessionManager = golf.NewMemorySessionManager()
 	app.Error(404, NotFoundHandler)
 
-	registerAdminURLHandlers()
-	registerHomeHandler()
-	registerAPIHandler()
+	registerAdminURLHandlers(app)
+	registerHomeHandler(app)
+	registerAPIHandler(app)
 
 	return app
 }
 
-func registerFuncMap() {
+func registerFuncMap(app *golf.Application) {
 	app.View.FuncMap["DateFormat"] = utils.DateFormat
 	app.View.FuncMap["Now"] = utils.Now
 	app.View.FuncMap["Html2Str"] = utils.Html2Str
@@ -50,7 +46,7 @@ func registerFuncMap() {
 	app.View.FuncMap["Md2html"] = utils.Markdown2HtmlTemplate
 }
 
-func registerMiddlewares() {
+func registerMiddlewares(app *golf.Application) {
 	app.Use(
 		golf.LoggingMiddleware(os.Stdout),
 		golf.RecoverMiddleware,
@@ -58,7 +54,7 @@ func registerMiddlewares() {
 	)
 }
 
-func registerAdminURLHandlers() {
+func registerAdminURLHandlers(app *golf.Application) {
 	authChain := golf.NewChain(AuthMiddleware)
 	app.Get("/login/", AuthLoginPageHandler)
 	app.Post("/login/", AuthLoginHandler)
@@ -106,7 +102,7 @@ func registerAdminURLHandlers() {
 	app.Get("/admin/monitor/", authChain.Final(AdminMonitorPage))
 }
 
-func registerHomeHandler() {
+func registerHomeHandler(app *golf.Application) {
 	statsChain := golf.NewChain()
 	app.Get("/", statsChain.Final(HomeHandler))
 	app.Get("/page/:page/", HomeHandler)
@@ -118,27 +114,11 @@ func registerHomeHandler() {
 	app.Get("/:slug/", statsChain.Final(ContentHandler))
 }
 
-func registerAPIHandler() {
-	// Auth
-	app.Post("/auth", JWTAuthLoginHandler)
-	app.Get("/auth", JWTAuthValidateHandler)
-
-	// register the API handler
+func registerAPIHandler(app *golf.Application) {
 	app.Get("/api", APIDocumentationHandler)
-
-	// Posts
-	app.Get("/api/posts", APIPostsHandler)
-	app.Get("/api/posts/:id", APIPostHandler)
-	app.Get("/api/posts/slug/:slug", APIPostSlugHandler)
-
-	// Tags
-	app.Get("/api/tags", APITagsHandler)
-	app.Get("/api/tags/:id", APITagHandler)
-	app.Get("/api/tags/slug/:slug", APITagSlugHandler)
-
-	// Users
-	app.Get("/api/users", APIUsersHandler)
-	app.Get("/api/users/:id", APIUserHandler)
-	app.Get("/api/users/slug/:slug", APIUserSlugHandler)
-	app.Get("/api/users/email/:email", APIUserEmailHandler)
+	registerJWTHandlers(app)
+	registerPostHandlers(app)
+	registerTagHandlers(app)
+	registerUserHandlers(app)
+	registerCommentsHandlers(app)
 }
