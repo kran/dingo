@@ -374,23 +374,6 @@ func (posts *Posts) GetPostList(page, size int64, isPage bool, onlyPublished boo
 	return pager, err
 }
 
-func (posts *Posts) GetAllPostList(isPage bool, isPublished bool, orderBy string) error {
-	var where string
-	if isPage {
-		where = `page = 1`
-	} else {
-		where = `page = 0`
-	}
-	if isPublished {
-		where = where + ` AND published = 1`
-	} else {
-		where = where + ` AND published = 0`
-	}
-	safeOrderBy := getSafeOrderByStmt(orderBy)
-	err := meddler.QueryAll(db, posts, fmt.Sprintf(stmtGetAllPostList, where, safeOrderBy))
-	return err
-}
-
 func PostChangeSlug(slug string) bool {
 	post := new(Post)
 	err := post.GetPostBySlug(slug)

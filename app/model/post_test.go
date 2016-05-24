@@ -155,14 +155,6 @@ func TestPost(t *testing.T) {
 				So(err, ShouldBeNil)
 			})
 
-			Convey("Get all posts list", func() {
-				posts := new(Posts)
-				err := posts.GetAllPostList(false, false, "created_at")
-
-				So(posts, ShouldHaveLength, 1)
-				So(err, ShouldBeNil)
-			})
-
 			Convey("Create a post with the same slug", func() {
 				newPost := mockPost()
 				err := newPost.Save()
