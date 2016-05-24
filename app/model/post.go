@@ -19,6 +19,7 @@ const stmtGetPostBySlug = `SELECT * FROM posts WHERE slug = ?`
 const stmtGetPostsByTag = `SELECT * FROM posts WHERE %s id IN ( SELECT post_id FROM posts_tags WHERE tag_id = ? ) ORDER BY published_at DESC LIMIT ? OFFSET ?`
 const stmtGetAllPostsByTag = `SELECT * FROM posts WHERE id IN ( SELECT post_id FROM posts_tags WHERE tag_id = ?) ORDER BY published_at DESC `
 const stmtGetPostsCountByTag = "SELECT count(*) FROM posts, posts_tags WHERE posts_tags.post_id = posts.id AND posts.published AND posts_tags.tag_id = ?"
+const stmtGetPostsOffsetLimit = `SELECT * FROM posts WHERE published = ? LIMIT ?, ?`
 const stmtInsertPostTag = `INSERT INTO posts_tags (id, post_id, tag_id) VALUES (?, ?, ?)`
 const stmtDeletePostTagsByPostId = `DELETE FROM posts_tags WHERE post_id = ?`
 const stmtNumberOfPosts = "SELECT count(*) FROM posts WHERE %s"
@@ -421,4 +422,29 @@ func getSafeOrderByStmt(orderBy string) string {
 		return stmt
 	}
 	return "published_at DESC"
+}
+
+func GetPublishedPosts(offset, limit int) (Posts, error) {
+	var posts Posts
+	err := meddler.QueryAll(db, &posts, stmtGetPostsOffsetLimit, 1, offset, limit)
+	return posts, err
+}
+
+func GetUnpublishedPosts(offset, limit int) (Posts, error) {
+	var posts Posts
+	err := meddler.QueryAll(db, &posts, stmtGetPostsOffsetLimit, 0,  offset, limit)
+	return posts, err
+}
+
+func GetAllPosts(offset, limit int) ([]*Post, error) {
+	pubPosts, err := GetPublishedPosts(offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	unpubPosts, err := GetUnpublishedPosts(offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	posts := append(pubPosts, unpubPosts...)
+	return posts, nil
 }

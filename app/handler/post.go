@@ -12,7 +12,7 @@ import (
 
 func registerPostHandlers(app *golf.Application, routes map[string]map[string]interface{}) {
 	adminChain := golf.NewChain(JWTAuthMiddleware)
-	app.Get("/api/posts", APIPostsHandler)
+	app.Get("/api/posts", APIPostsHandler(0, 10))
 	routes["GET"]["posts_url"] = "/api/posts"
 
 	app.Get("/api/posts/:post_id", APIPostHandler)
@@ -91,34 +91,52 @@ func APIPostSlugHandler(ctx *golf.Context) {
 	ctx.JSON(NewAPISuccessResponse(post))
 }
 
-// APIPostsHandler gets every page, ordered by publication date.
-func APIPostsHandler(ctx *golf.Context) {
-	posts := new(model.Posts)
-	switch limitPublixhed := ctx.Param("published") {
-	case "true":
-		pubPosts := posts.GetAllPostList(false, true, "published_at DESC")
-		posts.AppendPosts(pubPosts)
-	case "false":
-		unpubPosts := posts.GetAllPostList(false, false, "created_at DESC")
-		posts.AppendPosts(unpubPosts)
-	default:
-		pubPosts := posts.GetAllPostList(false, true, "published_at DESC")
-		posts.AppendPosts(pubPosts)
-		unpubPosts := posts.GetAllPostList(false, false, "created_at DESC")
-		posts.AppendPosts(unpubPosts)
+// APIPostsHandler gets an array of posts of length <= limit, starting at offset.
+// To paginate through posts, increment offset by limit until the length of the
+// post array in the response is less than limit.
+func APIPostsHandler(offset, limit int) golf.HandlerFunc {
+	// offset, limit args are default values
+	return func(ctx *golf.Context) {
+		var posts []*model.Post
+		var err error
+		err = ctx.Request.ParseForm()
+		if err != nil {
+			ctx.SendStatus(http.StatusInternalServerError)
+			ctx.JSON(APIResponseBodyJSON{Status: NewErrorStatusJSON(err.Error())})
+			return
+		}
+		if q, _ := ctx.Query("offset"); q != "" {
+			offset, err = strconv.Atoi(q)
+		}
+		if err != nil {
+			ctx.SendStatus(http.StatusBadRequest)
+			ctx.JSON(APIResponseBodyJSON{Status: NewErrorStatusJSON(err.Error())})
+			return
+		}
+		if q, _ := ctx.Query("limit"); q != "" {
+			limit, err = strconv.Atoi(q)
+		}
+		if err != nil {
+			ctx.SendStatus(http.StatusBadRequest)
+			ctx.JSON(APIResponseBodyJSON{Status: NewErrorStatusJSON(err.Error())})
+			return
+		}
+		published, _ := ctx.Query("published")
+		switch published {
+		case "true":
+			posts, err = model.GetPublishedPosts(offset, limit)
+		case "false":
+			posts, err = model.GetUnpublishedPosts(offset, limit)
+		default:
+			posts, err = model.GetAllPosts(offset, limit)
+		}
+		if err != nil {
+			ctx.SendStatus(http.StatusInternalServerError)
+			ctx.JSON(APIResponseBodyJSON{Status: NewErrorStatusJSON(err.Error())})
+			return
+		}
+		ctx.JSON(NewAPISuccessResponse(posts))
 	}
-	ctx.JSON(NewAPISuccessResponse(posts))
-	limitPublished, convErr := strconv.ParseBool(limitPublished)
-	if convErr != nil {
-		handleErr(ctx, 500, convErr)
-		return
-	}
-	err := posts.GetAllPostList(false, true, "published_at DESC")
-	if err != nil {
-		handleErr(ctx, 404, err)
-		return
-	}
-	ctx.JSON(NewAPISuccessResponse(posts))
 }
 
 // APIPostCommentsHandler gets the comments on the given post.

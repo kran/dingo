@@ -168,7 +168,6 @@ func buildCommentTree(p *Comment, c *Comment, level int) {
 func DeleteComment(id int64) error {
 	writeDB, err := db.Begin()
 	if err != nil {
-		writeDB
 		writeDB.Rollback()
 		return err
 	}
