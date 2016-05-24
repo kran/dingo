@@ -12,7 +12,7 @@ $(function () {
     success: function (json) {
       if (json.status === "success") {
         alertify.success("Content saved", 'success');
-        window.history.pushState({},"", "../" + json.content.Id + "/");
+        window.history.pushState({}, "", "/admin/editor/" + json.content.Id + "/");
       } else {
         alertify.error(json.msg);
       }

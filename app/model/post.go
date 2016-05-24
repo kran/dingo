@@ -8,9 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"net/http"
+
 	"github.com/dingoblog/dingo/app/utils"
 	"github.com/russross/meddler"
-	"net/http"
 )
 
 const stmtGetPostById = `SELECT * FROM posts WHERE id = ?`
@@ -221,6 +222,7 @@ func (p *Post) Update() error {
 
 func (p *Post) UpdateFromRequest(r *http.Request) {
 	p.Title = r.FormValue("title")
+	p.Image = r.FormValue("image")
 	p.Slug = r.FormValue("slug")
 	p.Markdown = r.FormValue("content")
 	p.Html = utils.Markdown2Html(p.Markdown)
