@@ -3,7 +3,7 @@
 ![Dingo Logo](https://cloud.githubusercontent.com/assets/1311594/15427334/652081ae-1e62-11e6-9ae3-1dd0a667f22d.png)
 
 [![CI status](https://img.shields.io/travis/dingoblog/dingo.svg)]()
-[![Join Dingo Gitter](https://img.shields.io/gitter/room/dingoblog/dingo.svg)](https://gitter.im/dingoblog?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
+[![Gitter](https://badges.gitter.im/dingoblog/dingo.svg)](https://gitter.im/dingoblog/dingo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 Dingo is a full-featured blog engine written in Go.
 
