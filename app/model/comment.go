@@ -137,7 +137,7 @@ func (c *Comment) GetCommentById() error {
 
 func (c *Comment) getChildComments() (*Comments, error) {
 	comments := new(Comments)
-	err := meddler.QueryAll(db, c, stmtGetCommentsByParentId, c.Id)
+	err := meddler.QueryAll(db, comments, stmtGetCommentsByParentId, c.Id)
 	return comments, err
 }
 
