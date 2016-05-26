@@ -14,6 +14,8 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+// A JWT is a JSON web token, and contains all the values necessary to create
+// and validate tokens.
 type JWT struct {
 	UserRole   int    `json:"user_role"`
 	UserID     int64  `json:"user_id"`
@@ -27,6 +29,8 @@ var (
 	signKey   *rsa.PrivateKey
 )
 
+// InitializeKey initializes the public and private keys used to create and
+// validate JSON web tokens.
 func InitializeKey(privKeyPath, pubKeyPath string) {
 	createJWTKeyFiles(privKeyPath, pubKeyPath)
 
@@ -51,6 +55,7 @@ func InitializeKey(privKeyPath, pubKeyPath string) {
 	}
 }
 
+// NewJWT returns a JWT for the given User.
 func NewJWT(user *User) (JWT, error) {
 	method := jwt.GetSigningMethod("RS256")
 	token := jwt.New(method)
@@ -74,6 +79,7 @@ func NewJWT(user *User) (JWT, error) {
 	}, nil
 }
 
+// NewJWTFromToken returns a JWT for the given token.
 func NewJWTFromToken(token *jwt.Token) JWT {
 	userRole := token.Claims["UserRole"].(float64)
 	userID := token.Claims["UserID"].(float64)
@@ -88,6 +94,8 @@ func NewJWTFromToken(token *jwt.Token) JWT {
 	}
 }
 
+// ValidateJWT validates a JSON web token, returning the token if it is
+// indeed valid.
 func ValidateJWT(t string) (*jwt.Token, error) {
 	token, err := jwt.Parse(t, func(token *jwt.Token) (interface{}, error) {
 		return verifyKey, nil
@@ -113,6 +121,8 @@ func ValidateJWT(t string) (*jwt.Token, error) {
 	}
 }
 
+// GenerateJWTKeys generates a new public/private key pair, to be used to
+// create and validate JSON web tokens.
 func GenerateJWTKeys(bits int) ([]byte, []byte, error) {
 	// http://stackoverflow.com/questions/21151714/go-generate-an-ssh-public-key
 	privateKey, err := rsa.GenerateKey(rand.Reader, bits)
