@@ -348,6 +348,7 @@ func GetNumberOfPosts(isPage bool, published bool) (int64, error) {
 	return count, nil
 }
 
+// GetPostList returns a new pager based on all the posts in the DB.
 func (posts *Posts) GetPostList(page, size int64, isPage bool, onlyPublished bool, orderBy string) (*utils.Pager, error) {
 	var pager *utils.Pager
 	count, err := GetNumberOfPosts(isPage, onlyPublished)
@@ -371,7 +372,16 @@ func (posts *Posts) GetPostList(page, size int64, isPage bool, onlyPublished boo
 	return pager, err
 }
 
-func (posts *Posts) GetAllPostList(isPage bool, onlyPublished bool, orderBy string) error {
+// GetAllPostList gets all the posts, with the options to get only pages, or
+// only published posts. It is also possible to order the posts, with the order
+// by string being one of six options:
+//         "created_at"
+//         "created_at DESC"
+//         "updated_at"
+//         "updated_at DESC"
+//         "published_at"
+//         "published_at DESC"
+func (p *Posts) GetAllPostList(isPage bool, onlyPublished bool, orderBy string) error {
 	var where string
 	if isPage {
 		where = `page = 1`
@@ -382,10 +392,12 @@ func (posts *Posts) GetAllPostList(isPage bool, onlyPublished bool, orderBy stri
 		where = where + ` AND published`
 	}
 	safeOrderBy := getSafeOrderByStmt(orderBy)
-	err := meddler.QueryAll(db, posts, fmt.Sprintf(stmtGetAllPostList, where, safeOrderBy))
+	err := meddler.QueryAll(db, p, fmt.Sprintf(stmtGetAllPostList, where, safeOrderBy))
 	return err
 }
 
+// PostChangeSlug checks to see if there is a post associated with the given
+// slug, and returns true if there isn't.
 func PostChangeSlug(slug string) bool {
 	post := new(Post)
 	err := post.GetPostBySlug(slug)

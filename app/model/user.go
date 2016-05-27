@@ -16,6 +16,7 @@ const stmtInsertRoleUser = `INSERT INTO roles_users (id, role_id, user_id) VALUE
 const stmtGetUsersCountByEmail = `SELECT count(*) FROM users where email = ?`
 const stmtGetNumberOfUsers = `SELECT COUNT(*) FROM users`
 
+// A User is a user on the site.
 type User struct {
 	Id             int64      `meddler:"id,pk"`
 	Name           string     `meddler:"name"`
@@ -40,6 +41,8 @@ type User struct {
 
 var ghostUser = &User{Id: 0, Name: "Dingo User", Email: "example@example.com"}
 
+// NewUser creates a new user from the given email and name, with the CreatedAt
+// and UpdatedAt fields set to the current time.
 func NewUser(email, name string) *User {
 	return &User{
 		Email:     email,
@@ -49,6 +52,8 @@ func NewUser(email, name string) *User {
 	}
 }
 
+// Create saves a user in the DB with the given password, first hashing and
+// salting that password via bcrypt.
 func (u *User) Create(password string) error {
 	var err error
 	u.HashedPassword, err = EncryptPassword(password)
@@ -59,6 +64,7 @@ func (u *User) Create(password string) error {
 	return u.Save()
 }
 
+// Save saves a user to the DB.
 func (u *User) Save() error {
 	err := u.Insert()
 	//	err = InsertRoleUser(u.Role, userId)
@@ -68,6 +74,7 @@ func (u *User) Save() error {
 	return err
 }
 
+// Update updates an existing user in the DB.
 func (u *User) Update() error {
 	u.UpdatedAt = utils.Now()
 	// TODO:
@@ -76,6 +83,7 @@ func (u *User) Update() error {
 	return err
 }
 
+// ChangePassword changes the password for the given user.
 func (u *User) ChangePassword(password string) error {
 	var err error
 	u.HashedPassword, err = EncryptPassword(password)
@@ -86,6 +94,8 @@ func (u *User) ChangePassword(password string) error {
 	return err
 }
 
+// EncrypPassword hashes and salts the given password via bcrypt, returning
+// the newly hashed and salted password.
 func EncryptPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
@@ -94,6 +104,8 @@ func EncryptPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
+// CheckPassword checks to see if the given password matches the hashed password
+// for the given user, returning true if it's a match.
 func (u *User) CheckPassword(password string) bool {
 	err := u.GetUserByEmail()
 	if err != nil {
@@ -106,35 +118,43 @@ func (u *User) CheckPassword(password string) bool {
 	return true
 }
 
+// Avatar returns the Gravatar of the given user, with the Gravatar being
+// 150px by 150px.
 func (u *User) Avatar() string {
 	return utils.Gravatar(u.Email, "150")
 }
 
-func (user *User) GetUserById() error {
-	err := meddler.QueryRow(db, user, stmtGetUserById, user.Id)
+// GetUserById finds the user by ID in the DB.
+func (u *User) GetUserById() error {
+	err := meddler.QueryRow(db, u, stmtGetUserById, u.Id)
 	return err
 }
 
-func (user *User) GetUserBySlug() error {
-	err := meddler.QueryRow(db, user, stmtGetUserBySlug, user.Slug)
+// GetUserBySlug finds the user by their slug in the DB.
+func (u *User) GetUserBySlug() error {
+	err := meddler.QueryRow(db, u, stmtGetUserBySlug, u.Slug)
 	return err
 }
 
-func (user *User) GetUserByName() error {
-	err := meddler.QueryRow(db, user, stmtGetUserByName, user.Name)
+// GetUserByName finds the user by name in the DB.
+func (u *User) GetUserByName() error {
+	err := meddler.QueryRow(db, u, stmtGetUserByName, u.Name)
 	return err
 }
 
-func (user *User) GetUserByEmail() error {
-	err := meddler.QueryRow(db, user, stmtGetUserByEmail, user.Email)
+// GetUserByEmail finds the user by email in the DB.
+func (u *User) GetUserByEmail() error {
+	err := meddler.QueryRow(db, u, stmtGetUserByEmail, u.Email)
 	return err
 }
 
+// Insert inserts the user into the DB.
 func (u *User) Insert() error {
 	err := meddler.Insert(db, "users", u)
 	return err
 }
 
+// InsertRoleUser assigns a role to the given user based on the given Role ID.
 func InsertRoleUser(role_id int, user_id int64) error {
 	writeDB, err := db.Begin()
 	if err != nil {
@@ -149,6 +169,7 @@ func InsertRoleUser(role_id int, user_id int64) error {
 	return writeDB.Commit()
 }
 
+// UserEmailExist checks to see if the given User's email exists.
 func (u User) UserEmailExist() bool {
 	var count int64
 	row := db.QueryRow(stmtGetUsersCountByEmail, u.Email)
@@ -159,6 +180,7 @@ func (u User) UserEmailExist() bool {
 	return false
 }
 
+// GetNumberOfUsers returns the total number of users.
 func GetNumberOfUsers() (int64, error) {
 	var count int64
 	row := db.QueryRow(stmtGetNumberOfUsers)
