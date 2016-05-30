@@ -2,6 +2,7 @@ package utils
 
 import "fmt"
 
+// A Pager contains info used to handle pagination.
 type Pager struct {
 	Current   int64
 	Size      int64
@@ -17,6 +18,8 @@ type Pager struct {
 	IsValid   bool
 }
 
+// NewPager returns a new Pager, with the given options. It will panic if the
+// pager size is less than zero.
 func NewPager(page, size, total int64) *Pager {
 	if size <= 0 {
 		panic(fmt.Errorf("Pager size can not be less than 0"))

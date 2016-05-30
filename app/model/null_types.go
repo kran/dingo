@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// NullTime is an instant in time, with an extra flag to determine whether
+// or not the time is valid. A time is considered "Valid" if it is "NOT NULL".
 type NullTime struct {
 	Time  time.Time
 	Valid bool // Valid is true if Time is not NULL

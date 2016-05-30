@@ -8,6 +8,8 @@ import (
 	"os"
 )
 
+// FileSize returns the file size as a string, formatted in the way people
+// usually see filenames, ex: "1MB", "3KB", "60B".
 func FileSize(size int64) string {
 	s := float64(size)
 	if s > 1024*1024 {
@@ -19,6 +21,8 @@ func FileSize(size int64) string {
 	return fmt.Sprintf("%f B", s)
 }
 
+// IsFile returns whether or not a given path name has a corresponding file
+// name.
 func IsFile(path string) bool {
 	f, e := os.Stat(path)
 	if e != nil {
@@ -30,6 +34,8 @@ func IsFile(path string) bool {
 	return true
 }
 
+// IsDir returns whether or not a given path name has a corresponding directory
+// name.
 func IsDir(path string) bool {
 	f, e := os.Stat(path)
 	if e != nil {
@@ -38,7 +44,8 @@ func IsDir(path string) bool {
 	return f.IsDir()
 }
 
-// Copies file source to destination dest.
+// CopyFile copies the source file to the destination file. If the destination
+// file does not yet exist, it will create a new file there.
 func CopyFile(source string, dest string) (err error) {
 	sf, err := os.Open(source)
 	if err != nil {
@@ -62,8 +69,9 @@ func CopyFile(source string, dest string) (err error) {
 	return
 }
 
-// Recursively copies a directory tree, attempting to preserve permissions.
-// Source directory must exist, destination directory must *not* exist.
+// CopyDir recursively copies a directory tree, attempting to preserve
+// permissions. The source directory must exist, but destination directory must
+// *not* exist.
 func CopyDir(source string, dest string) (err error) {
 
 	// get properties of source dir
@@ -117,7 +125,7 @@ type copyError struct {
 	s string
 }
 
-// Returns the error message defined in What as a string
+// Error returns the error message defined in the copy error as a string.
 func (e *copyError) Error() string {
 	return e.s
 }
