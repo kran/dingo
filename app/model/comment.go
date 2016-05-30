@@ -9,9 +9,10 @@ import (
 	"github.com/russross/meddler"
 )
 
+// Comments are a slice of "Comment"s
 type Comments []*Comment
 
-// Comment struct defines a comment item data.
+// A Comment defines comment item data.
 type Comment struct {
 	Id        int64      `meddler:"id,pk"`
 	PostId    int64      `meddler:"post_id"`
@@ -30,30 +31,37 @@ type Comment struct {
 	Children  *Comments  `meddler:"-"`
 }
 
+// Len returns the number of "Comment"s in a "Comments".
 func (c Comments) Len() int {
 	return len(c)
 }
 
+// Get returns the Comment at the given index.
 func (c Comments) Get(i int) *Comment {
 	return c[i]
 }
 
+// GetAll returns a slice of all the "Comment"s.
 func (c Comments) GetAll() []*Comment {
 	return c
 }
 
+// NewComment returns a new comment, with the CreatedAt field set to the
+// current time.
 func NewComment() *Comment {
 	return &Comment{
 		CreatedAt: utils.Now(),
 	}
 }
 
+// Save saves the comment in the DB.
 func (c *Comment) Save() error {
 	c.Avatar = utils.Gravatar(c.Email, "50")
 	err := meddler.Save(db, "comments", c)
 	return err
 }
 
+// ToJson returns a comment as a map, in order to be encoded as JSON.
 func (c *Comment) ToJson() map[string]interface{} {
 	m := make(map[string]interface{})
 	m["id"] = c.Id
@@ -71,6 +79,8 @@ func (c *Comment) ToJson() map[string]interface{} {
 	return m
 }
 
+// ParentContent returns the parent of a given comment, if it exists. Used for
+// threaded comments.
 func (c *Comment) ParentContent() string {
 	if c.Parent < 1 {
 		return ""
@@ -86,6 +96,7 @@ func (c *Comment) ParentContent() string {
 	return str
 }
 
+// GetNumberOfComments returns the total number of comments in the DB.
 func GetNumberOfComments() (int64, error) {
 	var count int64
 	var row *sql.Row
@@ -97,7 +108,8 @@ func GetNumberOfComments() (int64, error) {
 	return count, nil
 }
 
-func (comments *Comments) GetCommentList(page, size int64, onlyApproved bool) (*utils.Pager, error) {
+// GetCommentList returns a new pager based on the total number of comments.
+func (c *Comments) GetCommentList(page, size int64, onlyApproved bool) (*utils.Pager, error) {
 	var pager *utils.Pager
 
 	count, err := GetNumberOfComments()
@@ -112,40 +124,46 @@ func (comments *Comments) GetCommentList(page, size int64, onlyApproved bool) (*
 		where = `WHERE approved = 1`
 	}
 
-	err = meddler.QueryAll(db, comments, fmt.Sprintf(stmtGetCommentList, where), size, pager.Begin)
+	err = meddler.QueryAll(db, c, fmt.Sprintf(stmtGetCommentList, where), size, pager.Begin)
 	return pager, err
 }
 
-func (comment *Comment) GetCommentById() error {
-	err := meddler.QueryRow(db, comment, stmtGetCommentById, comment.Id)
+// GetCommentById gets a comment by its ID, and populates that comment struct
+// with the contents for that comment from the DB.
+func (c *Comment) GetCommentById() error {
+	err := meddler.QueryRow(db, c, stmtGetCommentById, c.Id)
 	return err
 }
 
-func (comment *Comment) getChildComments() (*Comments, error) {
+func (c *Comment) getChildComments() (*Comments, error) {
 	comments := new(Comments)
-	err := meddler.QueryAll(db, comments, stmtGetCommentsByParentId, comment.Id)
+	err := meddler.QueryAll(db, comments, stmtGetCommentsByParentId, c.Id)
 	return comments, err
 }
 
-func (comment *Comment) ParentComment() (*Comment, error) {
+// ParentComment returns the associated parent Comment, if one exists.
+func (c *Comment) ParentComment() (*Comment, error) {
 	parent := NewComment()
-	parent.Id = comment.Parent
+	parent.Id = c.Parent
 	return parent, parent.GetCommentById()
 }
 
-func (comment *Comment) Post() *Post {
+// Post returns the post associated with the commment.
+func (c *Comment) Post() *Post {
 	post := NewPost()
-	post.Id = comment.PostId
+	post.Id = c.PostId
 	post.GetPostById()
 	return post
 }
 
+// GetCommentsByPostId gets all the comments for the given post ID.
 func (comments *Comments) GetCommentsByPostId(id int64) error {
 	err := meddler.QueryAll(db, comments, stmtGetParentCommentsByPostId, id)
 	for _, c := range *comments {
 		buildCommentTree(c, c, 1)
 	}
 	return err
+
 }
 
 func buildCommentTree(p *Comment, c *Comment, level int) {
@@ -165,6 +183,7 @@ func buildCommentTree(p *Comment, c *Comment, level int) {
 	}
 }
 
+// DeleteComment deletes the comment with the given ID from the DB.
 func DeleteComment(id int64) error {
 	writeDB, err := db.Begin()
 	if err != nil {
@@ -179,6 +198,8 @@ func DeleteComment(id int64) error {
 	return writeDB.Commit()
 }
 
+// ValidateComment validates a comment to ensure that all required data exists
+// and is valid. Returns an empty string on success.
 func (c *Comment) ValidateComment() string {
 	if utils.IsEmptyString(c.Author) || utils.IsEmptyString(c.Content) {
 		return "Name, Email and Content are required fields."
