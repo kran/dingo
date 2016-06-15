@@ -75,10 +75,13 @@ Table:
 | From z | 4         | 6         | 0         |
 `
 
+// A Row contains data that can be Scanned into a variable.
 type Row interface {
 	Scan(dest ...interface{}) error
 }
 
+// Initialize sets up the DB by creaing a new connection, creating tables if
+// they don't exist yet, and creates the welcome data.
 func Initialize(dbPath string, dbExists bool) error {
 	if err := initConnection(dbPath); err != nil {
 		return err

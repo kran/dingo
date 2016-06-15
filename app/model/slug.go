@@ -6,6 +6,8 @@ import (
 	"unicode"
 )
 
+// GenerateSlug generates a URL-friendly slug. The table is one of "posts",
+// "tags", "navigation", or "users".
 func GenerateSlug(input string, table string) string {
 	output := strings.Map(func(r rune) rune {
 		switch {

@@ -21,6 +21,8 @@ func init() {
 	messageGenerator["backup"] = generateBackupMessage
 }
 
+// A Message is a simple bit of info, used to alert the admin on the admin
+// panel about things like new comments, etc.
 type Message struct {
 	Id        int        `meddler:"id,pk"`
 	Type      string     `meddler:"type"`
@@ -29,12 +31,15 @@ type Message struct {
 	CreatedAt *time.Time `meddler:"created_at"`
 }
 
+// Messages is a slice of "Message"s
 type Messages []*Message
 
+// Get returns the message at the given index inside Messages.
 func (m Messages) Get(i int) *Message {
 	return m[i]
 }
 
+// NewMessage creates a new message.
 func NewMessage(tp string, data interface{}) *Message {
 	mData := messageGenerator[tp](data)
 	if mData == "" {
@@ -49,17 +54,20 @@ func NewMessage(tp string, data interface{}) *Message {
 	}
 }
 
+// Insert saves a message to the DB.
 func (m *Message) Insert() error {
 	err := meddler.Insert(db, "messages", m)
 	return err
 }
 
+// SetMessageGenerator maps a message generator's name to a function.
 func SetMessageGenerator(name string, fn func(v interface{}) string) {
 	messageGenerator[name] = fn
 }
 
-func (messages *Messages) GetUnreadMessages() {
-	err := meddler.QueryAll(db, messages, stmtGetUnreadMessages)
+// GetUnreadMessages gets all unread messages from the DB.
+func (m *Messages) GetUnreadMessages() {
+	err := meddler.QueryAll(db, m, stmtGetUnreadMessages)
 	if err != nil {
 		panic(err)
 	}

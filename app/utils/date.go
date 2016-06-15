@@ -35,6 +35,26 @@ var conversion = map[rune]string{
 	/* nonStdMilli		 */ 'L': ".000",
 }
 
+// DateFormat implements formatted printing for time.Time values. It is similar
+// to fmt's printf utility, although the verbs are different.
+//
+// The verbs:
+//		%B		the full month, ex: "January"
+//		%b		an abbreviation of the month, ex: "Jan"
+//		%m 		the month as a number, with the leading zero included, ex: "01"
+//		%A		the full weekday, ex: "Monday"
+//		%a		an abbreviation of the weekday, ex: "Mon"
+//		%d		the day, with the leading zero included, ex: "31"
+//		%H		the hour, in 24 hour time, with the leading zero included, ex: "15"
+//		%I		the hour, in 12 hour time, with the leading zero included, ex: "08"
+//		%M		the minute, with the leading zero included, ex: "42"
+//		%S		the second, with the leading zero included, ex: "58"
+//		%Y		the full year, ex: "2016"
+//		%y		the last two digits of the year, ex: "16"
+//		%p		the meridiem, or more simply put, AM or PM, ex: "AM"
+//		%Z		letters representing the timezone, ex: "MST"
+//		%z		numbers representing the timezone, ex: "-0700"
+//		%L		milliseconds, ex: ".000"
 func DateFormat(t *time.Time, format string) string {
 	retval := make([]byte, 0, len(format))
 	for i, ni := 0, 0; i < len(format); i = ni + 2 {
@@ -65,6 +85,7 @@ func DateFormat(t *time.Time, format string) string {
 	return string(retval)
 }
 
+// Now returns the current time.
 func Now() *time.Time {
 	t := time.Now()
 	return &t

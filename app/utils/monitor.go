@@ -17,6 +17,8 @@ type monitorStats struct {
 	LastGcTime   string
 }
 
+// ReadMemStats reads and returns various stats from the runtime. Used for
+// displaying runtime info is the admin dashboard.
 func ReadMemStats() *monitorStats {
 	m := new(runtime.MemStats)
 	runtime.ReadMemStats(m)

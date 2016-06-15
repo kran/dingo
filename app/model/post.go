@@ -36,6 +36,8 @@ var safeOrderByStmt = map[string]string{
 	"published_at DESC": "published_at DESC",
 }
 
+// A Post contains all the content required to populate a post or page on the
+// blog. It also contains info to help sort and display the post.
 type Post struct {
 	Id              int64      `meddler:"id,pk",json:"id"`
 	Title           string     `meddler:"title",json:"title"`
@@ -61,28 +63,36 @@ type Post struct {
 	Category        string     `meddler:"-"`
 }
 
+// Posts is a slice of "Post"s
 type Posts []*Post
 
+// Len returns the amount of "Post"s.
 func (p Posts) Len() int {
 	return len(p)
 }
 
+// Get returns the Post at the given index.
 func (p Posts) Get(i int) *Post {
 	return p[i]
 }
 
+<<<<<<< HEAD
 func (p Posts) AppendPosts(posts Posts) {
 	for i := range posts {
 		p = append(p, posts[i])
 	}
 }
 
+=======
+// NewPost creates a new Post, with CreatedAt set to the current time.
+>>>>>>> master
 func NewPost() *Post {
 	return &Post{
 		CreatedAt: utils.Now(),
 	}
 }
 
+// TagString returns all the tags associated with a post as a single string.
 func (p *Post) TagString() string {
 	tags := new(Tags)
 	_ = tags.GetTagsByPostId(p.Id)
@@ -97,10 +107,12 @@ func (p *Post) TagString() string {
 	return tagString
 }
 
+// Url returns the URL of the post.
 func (p *Post) Url() string {
 	return "/" + p.Slug
 }
 
+// Tags returns a slice of every tag associated with the post.
 func (p *Post) Tags() []*Tag {
 	tags := new(Tags)
 	err := tags.GetTagsByPostId(p.Id)
@@ -110,6 +122,7 @@ func (p *Post) Tags() []*Tag {
 	return tags.GetAll()
 }
 
+// Author returns the User who authored the post.
 func (p *Post) Author() *User {
 	user := &User{Id: p.CreatedBy}
 	err := user.GetUserById()
@@ -119,6 +132,7 @@ func (p *Post) Author() *User {
 	return user
 }
 
+// Comments returns all the comments associated with the post.
 func (p *Post) Comments() []*Comment {
 	comments := new(Comments)
 	err := comments.GetCommentsByPostId(p.Id)
@@ -128,15 +142,18 @@ func (p *Post) Comments() []*Comment {
 	return comments.GetAll()
 }
 
+// Summary returns the post summary.
 func (p *Post) Summary() string {
 	text := strings.Split(p.Markdown, "<!--more-->")[0]
 	return utils.Markdown2Html(text)
 }
 
+// Excerpt returns the post execerpt, with a default length of 255 characters.
 func (p *Post) Excerpt() string {
 	return utils.Html2Excerpt(p.Html, 255)
 }
 
+// Save saves a post to the DB, updating any given tags to include the Post ID.
 func (p *Post) Save(tags ...*Tag) error {
 	p.Slug = strings.TrimLeft(p.Slug, "/")
 	p.Slug = strings.TrimRight(p.Slug, "/")
@@ -186,6 +203,7 @@ func (p *Post) Save(tags ...*Tag) error {
 	return DeleteOldTags()
 }
 
+// Insert saves a post to the DB.
 func (p *Post) Insert() error {
 	if !PostChangeSlug(p.Slug) {
 		p.Slug = generateNewSlug(p.Slug, 1)
@@ -194,13 +212,14 @@ func (p *Post) Insert() error {
 	return err
 }
 
-func InsertPostTag(post_id int64, tag_id int64) error {
+// InsertPostTag saves the Post ID to the given Tag ID in the DB.
+func InsertPostTag(postID int64, tagID int64) error {
 	writeDB, err := db.Begin()
 	if err != nil {
 		writeDB.Rollback()
 		return err
 	}
-	_, err = writeDB.Exec(stmtInsertPostTag, nil, post_id, tag_id)
+	_, err = writeDB.Exec(stmtInsertPostTag, nil, postID, tagID)
 	if err != nil {
 		writeDB.Rollback()
 		return err
@@ -208,6 +227,7 @@ func InsertPostTag(post_id int64, tag_id int64) error {
 	return writeDB.Commit()
 }
 
+// Update updates an existing post in the DB.
 func (p *Post) Update() error {
 	currentPost := &Post{Id: p.Id}
 	err := currentPost.GetPostById()
@@ -221,6 +241,8 @@ func (p *Post) Update() error {
 	return err
 }
 
+// UpdateFromRequest updates an existing Post in the DB based on the data
+// provided in the HTTP request.
 func (p *Post) UpdateFromRequest(r *http.Request) {
 	p.Title = r.FormValue("title")
 	p.Image = r.FormValue("image")
@@ -232,6 +254,7 @@ func (p *Post) UpdateFromRequest(r *http.Request) {
 	p.IsPublished = r.FormValue("status") == "on"
 }
 
+<<<<<<< HEAD
 func (p *Post) UpdateFromJSON(j []byte) error {
 	err := json.Unmarshal(j, p)
 	if err != nil {
@@ -250,12 +273,17 @@ func (p *Post) Publish(by int64) error {
 }
 
 func DeletePostTagsByPostId(post_id int64) error {
+=======
+// DeletePostTagsByPostId deletes removes tags associated with the given post
+// from the DB.
+func DeletePostTagsByPostId(postID int64) error {
+>>>>>>> master
 	writeDB, err := db.Begin()
 	if err != nil {
 		writeDB.Rollback()
 		return err
 	}
-	_, err = writeDB.Exec(stmtDeletePostTagsByPostId, post_id)
+	_, err = writeDB.Exec(stmtDeletePostTagsByPostId, postID)
 	if err != nil {
 		writeDB.Rollback()
 		return err
@@ -263,6 +291,7 @@ func DeletePostTagsByPostId(post_id int64) error {
 	return writeDB.Commit()
 }
 
+// DeletePostById deletes the given Post from the DB.
 func DeletePostById(id int64) error {
 	writeDB, err := db.Begin()
 	if err != nil {
@@ -285,6 +314,7 @@ func DeletePostById(id int64) error {
 	return DeleteOldTags()
 }
 
+<<<<<<< HEAD
 func (post *Post) GetPostById(id ...int64) error {
 	var postId int64
 	if len(id) == 0 {
@@ -293,15 +323,22 @@ func (post *Post) GetPostById(id ...int64) error {
 		postId = id[0]
 	}
 	err := meddler.QueryRow(db, post, stmtGetPostById, postId)
+=======
+// GetPostById gets the post based on the Post ID.
+func (p *Post) GetPostById() error {
+	err := meddler.QueryRow(db, p, stmtGetPostById, p.Id)
+>>>>>>> master
 	return err
 }
 
-func (post *Post) GetPostBySlug(slug string) error {
-	err := meddler.QueryRow(db, post, stmtGetPostBySlug, slug)
+// GetPostBySlug gets the post based on the Post Slug.
+func (p *Post) GetPostBySlug(slug string) error {
+	err := meddler.QueryRow(db, p, stmtGetPostBySlug, slug)
 	return err
 }
 
-func (posts *Posts) GetPostsByTag(tagId, page, size int64, onlyPublished bool) (*utils.Pager, error) {
+// GetPostsByTag returns a new pager based all the Posts associated with a Tag.
+func (p *Posts) GetPostsByTag(tagId, page, size int64, onlyPublished bool) (*utils.Pager, error) {
 	var (
 		pager *utils.Pager
 		count int64
@@ -321,15 +358,17 @@ func (posts *Posts) GetPostsByTag(tagId, page, size int64, onlyPublished bool) (
 	if onlyPublished {
 		where = "published AND"
 	}
-	err = meddler.QueryAll(db, posts, fmt.Sprintf(stmtGetPostsByTag, where), tagId, size, pager.Begin)
+	err = meddler.QueryAll(db, p, fmt.Sprintf(stmtGetPostsByTag, where), tagId, size, pager.Begin)
 	return pager, err
 }
 
-func (posts *Posts) GetAllPostsByTag(tagId int64) error {
-	err := meddler.QueryAll(db, posts, stmtGetAllPostsByTag, tagId)
+// GetAllPostsByTag gets all the Posts with the associated Tag.
+func (p *Posts) GetAllPostsByTag(tagId int64) error {
+	err := meddler.QueryAll(db, p, stmtGetAllPostsByTag, tagId)
 	return err
 }
 
+// GetNumberOfPosts gets the total number of posts in the DB.
 func GetNumberOfPosts(isPage bool, published bool) (int64, error) {
 	var count int64
 	var where string
@@ -351,6 +390,7 @@ func GetNumberOfPosts(isPage bool, published bool) (int64, error) {
 	return count, nil
 }
 
+// GetPostList returns a new pager based on all the posts in the DB.
 func (posts *Posts) GetPostList(page, size int64, isPage bool, onlyPublished bool, orderBy string) (*utils.Pager, error) {
 	var pager *utils.Pager
 	count, err := GetNumberOfPosts(isPage, onlyPublished)
@@ -374,6 +414,35 @@ func (posts *Posts) GetPostList(page, size int64, isPage bool, onlyPublished boo
 	return pager, err
 }
 
+<<<<<<< HEAD
+=======
+// GetAllPostList gets all the posts, with the options to get only pages, or
+// only published posts. It is also possible to order the posts, with the order
+// by string being one of six options:
+//         "created_at"
+//         "created_at DESC"
+//         "updated_at"
+//         "updated_at DESC"
+//         "published_at"
+//         "published_at DESC"
+func (p *Posts) GetAllPostList(isPage bool, onlyPublished bool, orderBy string) error {
+	var where string
+	if isPage {
+		where = `page = 1`
+	} else {
+		where = `page = 0`
+	}
+	if onlyPublished {
+		where = where + ` AND published`
+	}
+	safeOrderBy := getSafeOrderByStmt(orderBy)
+	err := meddler.QueryAll(db, p, fmt.Sprintf(stmtGetAllPostList, where, safeOrderBy))
+	return err
+}
+
+// PostChangeSlug checks to see if there is a post associated with the given
+// slug, and returns true if there isn't.
+>>>>>>> master
 func PostChangeSlug(slug string) bool {
 	post := new(Post)
 	err := post.GetPostBySlug(slug)

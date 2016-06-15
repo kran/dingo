@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// Html2Str converts the given HTML to a string, removing all HTML tags,
+// scripts, and styles, and removing continuous newline characters.
 func Html2Str(html string) string {
 	src := string(html)
 
@@ -33,6 +35,8 @@ func Html2Str(html string) string {
 	return strings.TrimSpace(src)
 }
 
+// SubString returns a substring of the given string from "begin" that is of
+// "length" characters long.
 func SubString(str string, begin, length int) (substr string) {
 	rs := []rune(str)
 	lth := len(rs)
@@ -49,14 +53,19 @@ func SubString(str string, begin, length int) (substr string) {
 	return string(rs[begin:end])
 }
 
+// Html2Excerpt returns the string from the given HTML that is "length" long.
 func Html2Excerpt(html string, length int) string {
 	return SubString(Html2Str(html), 0, length)
 }
 
+// Markdown2Html returns the given text as Markdown, using BlackFriday as a
+// markdown compiler.
 func Markdown2Html(text string) string {
 	return string(blackfriday.MarkdownCommon([]byte(text)))
 }
 
+// Markdown2HtmlTemplate returns the given text as Markdown, as the template
+// package's HTML type.
 func Markdown2HtmlTemplate(text string) template.HTML {
 	return template.HTML(Markdown2Html(text))
 }
