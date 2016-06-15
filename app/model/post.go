@@ -76,16 +76,13 @@ func (p Posts) Get(i int) *Post {
 	return p[i]
 }
 
-<<<<<<< HEAD
 func (p Posts) AppendPosts(posts Posts) {
 	for i := range posts {
 		p = append(p, posts[i])
 	}
 }
 
-=======
 // NewPost creates a new Post, with CreatedAt set to the current time.
->>>>>>> master
 func NewPost() *Post {
 	return &Post{
 		CreatedAt: utils.Now(),
@@ -254,7 +251,6 @@ func (p *Post) UpdateFromRequest(r *http.Request) {
 	p.IsPublished = r.FormValue("status") == "on"
 }
 
-<<<<<<< HEAD
 func (p *Post) UpdateFromJSON(j []byte) error {
 	err := json.Unmarshal(j, p)
 	if err != nil {
@@ -272,18 +268,15 @@ func (p *Post) Publish(by int64) error {
 	return err
 }
 
-func DeletePostTagsByPostId(post_id int64) error {
-=======
 // DeletePostTagsByPostId deletes removes tags associated with the given post
 // from the DB.
-func DeletePostTagsByPostId(postID int64) error {
->>>>>>> master
+func DeletePostTagsByPostId(post_id int64) error {
 	writeDB, err := db.Begin()
 	if err != nil {
 		writeDB.Rollback()
 		return err
 	}
-	_, err = writeDB.Exec(stmtDeletePostTagsByPostId, postID)
+	_, err = writeDB.Exec(stmtDeletePostTagsByPostId, post_id)
 	if err != nil {
 		writeDB.Rollback()
 		return err
@@ -314,7 +307,7 @@ func DeletePostById(id int64) error {
 	return DeleteOldTags()
 }
 
-<<<<<<< HEAD
+// GetPostById gets the post based on the Post ID.
 func (post *Post) GetPostById(id ...int64) error {
 	var postId int64
 	if len(id) == 0 {
@@ -323,11 +316,6 @@ func (post *Post) GetPostById(id ...int64) error {
 		postId = id[0]
 	}
 	err := meddler.QueryRow(db, post, stmtGetPostById, postId)
-=======
-// GetPostById gets the post based on the Post ID.
-func (p *Post) GetPostById() error {
-	err := meddler.QueryRow(db, p, stmtGetPostById, p.Id)
->>>>>>> master
 	return err
 }
 
@@ -414,8 +402,6 @@ func (posts *Posts) GetPostList(page, size int64, isPage bool, onlyPublished boo
 	return pager, err
 }
 
-<<<<<<< HEAD
-=======
 // GetAllPostList gets all the posts, with the options to get only pages, or
 // only published posts. It is also possible to order the posts, with the order
 // by string being one of six options:
@@ -442,7 +428,6 @@ func (p *Posts) GetAllPostList(isPage bool, onlyPublished bool, orderBy string) 
 
 // PostChangeSlug checks to see if there is a post associated with the given
 // slug, and returns true if there isn't.
->>>>>>> master
 func PostChangeSlug(slug string) bool {
 	post := new(Post)
 	err := post.GetPostBySlug(slug)
@@ -484,7 +469,7 @@ func GetPublishedPosts(offset, limit int) (Posts, error) {
 
 func GetUnpublishedPosts(offset, limit int) (Posts, error) {
 	var posts Posts
-	err := meddler.QueryAll(db, &posts, stmtGetPostsOffsetLimit, 0,  offset, limit)
+	err := meddler.QueryAll(db, &posts, stmtGetPostsOffsetLimit, 0, offset, limit)
 	return posts, err
 }
 
