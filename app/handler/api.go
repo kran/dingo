@@ -1,32 +1,49 @@
 package handler
 
 import (
+	"encoding/json"
+	"strings"
+
 	"github.com/dinever/golf"
+	"github.com/dingoblog/dingo/app/utils"
 )
+
+type APISerializeable interface {
+	Serialize() []byte
+}
+
+type APIStatusJSON struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
+type APIResponseBodyJSON struct {
+	Data   interface{}   `json:"data"`
+	Status APIStatusJSON `json:"status"`
+}
+
+func NewErrorStatusJSON(msgs ...string) APIStatusJSON {
+	msg := strings.Join(msgs, " ")
+	return APIStatusJSON{Status: "error", Message: msg}
+}
+
+func NewSuccessStatusJSON(msgs ...string) APIStatusJSON {
+	msg := strings.Join(msgs, " ")
+	return APIStatusJSON{Status: "success", Message: msg}
+}
+
+func NewAPISuccessResponse(data interface{}, msgs ...string) APIResponseBodyJSON {
+	status := NewSuccessStatusJSON(msgs...)
+	return APIResponseBodyJSON{Data: data, Status: status}
+}
 
 // APIDocumentationHandler shows which routes match with what functionality,
 // similar to https://api.github.com
-func APIDocumentationHandler(ctx *golf.Context) {
-	// Go doesn't display maps in the order they appear here, so if the order
-	// of these routes is important, it might be better to use a struct
-	routes := map[string]interface{}{
-		"auth_url":              "/auth/",
-		"api_documentation_url": "/api/",
-		"comments_url":          "/api/comments",
-		"comment_url":           "/api/comments/:id",
-		"comment_post_url":      "/api/comments/post/:id",
-		"posts_url":             "/api/posts/",
-		"post_url":              "/api/posts/:id",
-		"post_slug_url":         "/api/posts/slug/:slug",
-		"tags_url":              "/api/tags/",
-		"tag_url":               "/api/tags/:id",
-		"tag_slug_url":          "/api/tags/slug/:slug",
-		"users_url":             "/api/users/",
-		"user_url":              "/api/users/:id",
-		"user_slug_url":         "/api/users/slug/:slug",
-		"user_email_url":        "/api/users/email/:email",
+func APIDocumentationHandler(routes map[string]map[string]interface{}) golf.HandlerFunc {
+	return func(ctx *golf.Context) {
+		routes["GET"]["api_documentation_url"] = "/api"
+		ctx.JSONIndent(map[string]interface{}{"request_method": routes}, "", "  ")
 	}
-	ctx.JSONIndent(routes, "", "  ")
 }
 
 // handleErr sends the staus code and error message formatted as JSON.
@@ -35,4 +52,22 @@ func handleErr(ctx *golf.Context, statusCode int, err error) {
 		"statusCode": statusCode,
 		"error":      err.Error(),
 	}, "", "  ")
+}
+
+func (status APIStatusJSON) Serialize() []byte {
+	serializedStatus, err := json.Marshal(status)
+	if err != nil {
+		utils.LogOnError(err, "Unable to serialize status.", true)
+		return []byte("")
+	}
+	return serializedStatus
+}
+
+func (body APIResponseBodyJSON) Serialize() []byte {
+	serializedBody, err := json.Marshal(body)
+	if err != nil {
+		utils.LogOnError(err, "Unable to serialize response body.", true)
+		return []byte("")
+	}
+	return serializedBody
 }

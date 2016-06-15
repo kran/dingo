@@ -7,16 +7,23 @@ import (
 	"github.com/dingoblog/dingo/app/model"
 )
 
-func registerUserHandlers(app *golf.Application) {
+func registerUserHandlers(app *golf.Application, routes map[string]map[string]interface{}) {
 	app.Get("/api/users", APIUsersHandler)
-	app.Get("/api/users/:id", APIUserHandler)
+	routes["GET"]["users_url"] = "/api/users"
+
+	app.Get("/api/users/:user_id", APIUserHandler)
+	routes["GET"]["user_url"] = "/api/users/:user_id"
+
 	app.Get("/api/users/slug/:slug", APIUserSlugHandler)
+	routes["GET"]["user_slug_url"] = "/api/users/slug/:slug"
+
 	app.Get("/api/users/email/:email", APIUserEmailHandler)
+	routes["GET"]["user_email_url"] = "/api/users/email/:email"
 }
 
 // APIUserHandler retrieves the user with the given id.
 func APIUserHandler(ctx *golf.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := strconv.Atoi(ctx.Param("user_id"))
 	if err != nil {
 		handleErr(ctx, 500, err)
 		return

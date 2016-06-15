@@ -25,3 +25,8 @@ check:
 build: GOFLAGS += -i -o dingo
 build:
 	$(GO) build -v $(GOFLAGS) main.go
+
+.PHONY: run
+run: GOFLAGS += -race
+run:
+	$(GO) run -v $(GOFLAGS) main.go

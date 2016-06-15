@@ -115,10 +115,15 @@ func registerHomeHandler(app *golf.Application) {
 }
 
 func registerAPIHandler(app *golf.Application) {
-	app.Get("/api", APIDocumentationHandler)
-	registerJWTHandlers(app)
-	registerPostHandlers(app)
-	registerTagHandlers(app)
-	registerUserHandlers(app)
-	registerCommentsHandlers(app)
+	routes := map[string]map[string]interface{}{}
+	routes["GET"] = map[string]interface{}{}
+	routes["POST"] = map[string]interface{}{}
+	routes["PUT"] = map[string]interface{}{}
+	routes["DELETE"] = map[string]interface{}{}
+	registerJWTHandlers(app, routes)
+	registerPostHandlers(app, routes)
+	registerTagHandlers(app, routes)
+	registerUserHandlers(app, routes)
+	registerCommentsHandlers(app, routes)
+	app.Get("/api", APIDocumentationHandler(routes))
 }
