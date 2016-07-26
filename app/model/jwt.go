@@ -58,12 +58,14 @@ func InitializeKey(privKeyPath, pubKeyPath string) {
 // NewJWT returns a JWT for the given User.
 func NewJWT(user *User) (JWT, error) {
 	method := jwt.GetSigningMethod("RS256")
-	token := jwt.New(method)
-	token.Claims["UserRole"] = user.Role
-	token.Claims["UserID"] = user.Id
-	token.Claims["UserEmail"] = user.Email
 	exp := time.Now().Add(time.Minute * 3600).Unix()
-	token.Claims["exp"] = exp
+	claims := jwt.MapClaims{
+		"UserRole":  user.Role,
+		"UserID":    user.Id,
+		"UserEmail": user.Email,
+		"exp":       exp,
+	}
+	token := jwt.NewWithClaims(method, claims)
 
 	tokenString, err := token.SignedString(signKey)
 	if err != nil {
@@ -81,10 +83,10 @@ func NewJWT(user *User) (JWT, error) {
 
 // NewJWTFromToken returns a JWT for the given token.
 func NewJWTFromToken(token *jwt.Token) JWT {
-	userRole := token.Claims["UserRole"].(float64)
-	userID := token.Claims["UserID"].(float64)
-	userEmail := token.Claims["UserEmail"].(string)
-	expiration := token.Claims["exp"].(float64)
+	userRole := token.Claims.(jwt.MapClaims)["UserRole"].(float64)
+	userID := token.Claims.(jwt.MapClaims)["UserID"].(float64)
+	userEmail := token.Claims.(jwt.MapClaims)["UserEmail"].(string)
+	expiration := token.Claims.(jwt.MapClaims)["exp"].(float64)
 	return JWT{
 		UserRole:   int(userRole),
 		UserID:     int64(userID),
