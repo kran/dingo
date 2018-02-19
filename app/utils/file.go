@@ -107,13 +107,13 @@ func CopyDir(source string, dest string) (err error) {
 		if entry.IsDir() {
 			err = CopyDir(sfp, dfp)
 			if err != nil {
-				log.Println("[Error]: %v", err)
+				log.Printf("[Error]: %v", err)
 			}
 		} else {
 			// perform copy
 			err = CopyFile(sfp, dfp)
 			if err != nil {
-				log.Println("[Error]: %v", err)
+				log.Printf("[Error]: %v", err)
 			}
 		}
 
