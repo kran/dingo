@@ -2,9 +2,10 @@ package utils
 
 import (
 	"fmt"
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"time"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func ExampleDateFormat() {
@@ -20,6 +21,13 @@ func TestDateFormat(t *testing.T) {
 
 		Convey("Test DateFormat", func() {
 			So(dateFmt, ShouldEqual, "2009-11-10 23:00")
+		})
+	})
+
+	Convey("It should not panic when trying to format nil dates", t, func() {
+		dateFmt := DateFormat(nil, "%Y-%m-%d %H:%M")
+		Convey("Test DateFormat", func() {
+			So(dateFmt, ShouldEqual, "")
 		})
 	})
 }

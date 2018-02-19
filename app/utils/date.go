@@ -56,6 +56,10 @@ var conversion = map[rune]string{
 //		%z		numbers representing the timezone, ex: "-0700"
 //		%L		milliseconds, ex: ".000"
 func DateFormat(t *time.Time, format string) string {
+	if t == nil {
+		return ""
+	}
+
 	retval := make([]byte, 0, len(format))
 	for i, ni := 0, 0; i < len(format); i = ni + 2 {
 		ni = strings.IndexByte(format[i:], '%')
