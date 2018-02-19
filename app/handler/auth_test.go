@@ -187,8 +187,8 @@ func TestUserWithoutAuthentication(t *testing.T) {
 			ctx := mockContext(nil, "GET", "/admin/")
 			ctx.App.ServeHTTP(ctx.Response, ctx.Request)
 
-			Convey("Status code should be 301 redirection", func() {
-				So(ctx.Response.(*httptest.ResponseRecorder).Code, ShouldEqual, 301)
+			Convey("Status code should be 302 redirection", func() {
+				So(ctx.Response.(*httptest.ResponseRecorder).Code, ShouldEqual, 302)
 			})
 		})
 
