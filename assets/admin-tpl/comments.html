@@ -1,0 +1,123 @@
+{{ extends "/default.html" }}
+
+{{ define "body"}}
+
+<section class="tables-data">
+  <div class="mdl-color--blue-grey ml-header relative clear">
+    <div class="p-50">
+    </div>
+  </div>
+
+  <div class="mdl-grid mdl-grid--no-spacing">
+
+    <div class="mdl-cell mdl-cell--12-col  mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+      <div class="p-20 ml-card-holder ml-card-holder-first">
+
+        <div class="mdl-card dingo-card mdl-shadow--1dp m-b-30">
+          <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Comments</h2>
+          </div>
+
+
+          <table class="table mdl-data-table fullwidth">
+            <thead>
+              <tr>
+                <th class="mdl-data-table__cell--non-numeric">Author</th>
+                <th class="mdl-data-table__cell--non-numeric">Comment</th>
+                <th class="mdl-data-table__cell--non-numeric">Is Response To</th>
+                <th class="mdl-data-table__cell--non-numeric">Submitted At</th>
+                <th class="mdl-data-table__cell--non-numeric">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range .Comments}}
+              <tr id="comment-{{ .Id }}">
+                <td class="mdl-data-table__cell--non-numeric">
+                  <img src="{{.Avatar}}" alt="" class="circle responsive-img">
+                  {{ .Author }}
+                </td>
+                <td class="mdl-data-table__cell--non-numeric">
+                  {{ Html .Content }}
+                </td>
+                <td class="mdl-data-table__cell--non-numeric">{{ .PostId }}</td>
+                <td class="mdl-data-table__cell--non-numeric">{{ DateFormat .CreatedAt "%Y-%m-%d %H:%M" }}</td>
+
+                <td class="mdl-data-table__cell--non-numeric">
+                  {{ if .Approved }}
+                  <a rel="{{ .Id }}" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" disabled>
+                    <i class="material-icons f18">check</i>
+                  </a>
+                  {{ else }}
+                  <a rel="{{ .Id }}" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect mdl-color-text--green comment-approve">
+                    <i class="material-icons f18">check</i>
+                  </a>
+                  {{ end }}
+                  <a rel="{{ .Id }}" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect mdl-color-text--blue comment-reply">
+                    <i class="material-icons f18">reply</i>
+                  </a>
+                  <a rel="{{ .Id }}" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect mdl-color-text--red-400 comment-delete">
+                    <i class="material-icons f18">delete</i>
+                  </a>
+                </td>
+
+              </tr>
+              {{end}}
+
+              <tr id="comment-block" style="display:none;">
+                <td colspan="5" class="mdl-data-table__cell--non-numeric">
+                  <div class="row fullwidth">
+                    <form id="comment-form" action="/admin/comments/" method="POST" class="fullwidth">
+                      <div class="mdl-textfield mdl-js-textfield">
+                        <textarea class="mdl-textfield__input" type="text" rows= "3" id="content" name="content"></textarea>
+                        <label class="mdl-textfield__label" for="content">Reply to comment...</label>
+                      </div>
+
+                      <div class="row">
+                        <div class="input-field col s12">
+                          <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-color--blue-500">
+                            Save
+                            <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+                          </button>
+                          <a id="comment-close" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-color--red-300">
+                            Cancel
+                            <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+                          </a>
+                        </div>
+                        <input type="hidden" value="0" id="comment-parent" name="pid"/>
+                      </div>
+                    </form>
+
+                  </div>
+
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+
+          <div>
+            <div>
+            <div class="ml-data-table-pager p-10">
+
+              {{range .Pager.PageSlice}}
+              <a href="/admin/comments/?page={{.}}" class="mdl-button {{if eq $.Pager.Current .}}mdl-color--blue mdl-color-text--white{{end}}">
+                <span>{{.}}</span>
+              </a>
+              {{end}}
+            </div>
+          </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+
+
+{{end}}
+

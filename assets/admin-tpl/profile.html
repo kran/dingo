@@ -1,0 +1,71 @@
+{{ extends "/default.html" }}
+
+{{ define "body"}}
+<section class="text-fields ng-scope">
+  <div class="mdl-color--amber ml-header relative clear">
+    <div class="p-50"></div>
+  </div>
+
+  <div class="mdl-grid mdl-grid--no-spacing">
+
+    <div class="mdl-cell mdl-cell--9-col mdl-cell--12-col-tablet mdl-cell--12-col-phone no-p-l">
+      <div class="p-20 ml-card-holder ml-card-holder-first">
+        <div class="mdl-card mdl-shadow--1dp fullwidth">
+          <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Profile</h2>
+          </div>
+          <div class="p-15">
+
+            <form id="profile" name="profile-form" action="#" method="post">
+
+
+              <div class="mdl-textfield">
+                <p>Your profile avatar (Generated from <a href="https://en.gravatar.com/">Gravatar</a>)</p>
+                <img src="{{.User.Avatar}}" alt="{{.User.Name}}" class="circle"/>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" id="name" name="name" value="{{.User.Name}}">
+                <label class="mdl-textfield__label" for="name">Name</label>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" id="slug" name="slug" value="{{.User.Slug}}">
+                <label class="mdl-textfield__label" for="slug">Slug</label>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" id="email" name="email" value="{{.User.Email}}">
+                <label class="mdl-textfield__label" for="email">Email Address</label>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="url" id="website" name="url" value="{{.User.Website}}">
+                <label class="mdl-textfield__label" for="website">Personal Website</label>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <textarea class="mdl-textfield__input" type="text" rows= "3" id="bio" name="bio">{{.User.Bio}}</textarea>
+                <label class="mdl-textfield__label" for="bio">Bio</label>
+              </div>
+
+              <div class="m-t-20">
+                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--blue-500 mdl-js-ripple-effect">
+                  Save profile
+                  <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span></button>
+                <a href="/admin/password/" type="reset" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                  Change password
+                  <span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span></a>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{end}}
+

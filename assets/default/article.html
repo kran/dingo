@@ -1,0 +1,99 @@
+{{ extends "/default.html" }}
+
+{{ define "content"}}
+<div id="content">
+	<article class="post">
+		<div class="row">
+			<div class="col-lg-12">
+
+				<h1 class="post-title">{{ .Post.Title }}</h1>
+				<div class="post-meta"><span>By</span> <a href="#" title="{{ .Post.Author.Name }}">{{ .Post.Author.Name }}</a>,  <time datetime="{{DateFormat .Post.PublishedAt "%Y-%m-%d" }}">{{ DateFormat .Post.PublishedAt "%b %d, %Y"}}</time></div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="post-content">
+					{{Html .Post.Html }}
+				</div>
+			</div>
+		</div>
+		{{ if .Post.AllowComment }}
+		<div class="row">
+			<div class="col-md-12">
+				<div class="post-comments">
+					<h2>Comments</h2>
+					<div class="row">
+						<div class="col-lg-12">
+
+							<ul id="comment-list" class="comment-list">
+								{{ range .Post.Comments }}
+								{{ include "comment.html" }}
+								<ul class="comment-children">
+									{{ range .Children }}
+									{{ include "comment.html" }}
+									<ul class="comment-children">
+										{{ range .Children }}
+										{{ include "comment.html" }}
+										{{ end }}
+									</ul>
+									{{ end }}
+								</ul>
+								{{ end }}
+							</ul>
+
+							<button id="comment-show" class="button">Comment</button>
+
+							<form id="comment-form" class="hide" action="/comment/{{.Content.Id}}/" method="post">
+								<p class="comment-form-author">
+									<label for="author">Name <span class="required">*</span></label>
+									<input id="author" name="author" type="text" value="" size="30" aria-required="true" required="required">
+								</p>
+								<p class="comment-form-email">
+									<label for="email">Email <span class="required">*</span></label>
+									<input id="email" name="email" type="text" value="" size="30" aria-required="true" required="required">
+								</p>
+								<p class="comment-form-website">
+									<label for="website">Website</label>
+									<input id="website" name="website" type="text" value="" size="30">
+								</p>
+								<input id="comment-parent" type="hidden" value="0" name="pid"/>
+								<div class="comment-form-comment">
+									<button id="cancel-reply" class="button cancel-reply left hidden" type="button">Cancel Reply</button>
+									<textarea id="comment-content" name="comment" cols="45" rows="8" required="required"></textarea>
+								</div>
+								<button class="button left">Submit</button>
+								<button id="comment-cancel" class="button left" type="button">Cancel</button>
+							</form>
+
+							<script type="text/template" id="comment-tpl">
+								<li id="comment" class="comment">
+									<article id="div-comment" class="comment-body">
+										<footer class="comment-meta">
+											<div class="comment-author vcard">
+												<img src="" width="60" height="60" alt="" class="comment-avatar">
+												<a href="" rel="external nofollow" id="comment-name" class="comment-name"></a>
+											</div>
+											<div class="comment-metadata">
+												<span class="comment-message"></span>
+												<a href="#" class="comment-date">
+													<time datetime=""></time>
+												</a>
+											</div>
+										</footer>
+										<div class="comment-content">
+											<p></p>
+										</div>
+									</article>
+								</li>
+							</script>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{{ end }}
+	</article>
+</div>
+{{end}}

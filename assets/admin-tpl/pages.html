@@ -1,0 +1,55 @@
+{{ extends "/default.html" }}
+
+{{ define "body"}}
+
+  <div class="mdl-grid mdl-grid--no-spacing">
+
+    <div class="mdl-cell mdl-cell--12-col  mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+
+      <div class="mdl-grid">
+
+        {{ range .Pages }}
+        <div id="dingo-page-{{ .Id }}" class="mdl-cell mdl-cell--6-col mdl-cell--4-col-tablet">
+          <div class="mdl-card dingo-card dingo-card-post mdl-shadow--0dp">
+            <div class="p-15 mdl-card--expand">
+              <h3 class="no-margin w600">{{ .Title }}</h3>
+              <span class="timestamp">{{DateFormat .CreatedAt "%Y-%m-%d"}}</span>
+            </div>
+            <div class="mdl-card__supporting-text">
+              {{ .Excerpt }}
+              <div class="tags m-t-20">
+                <div class="f-right">
+                  <a href="{{ .Url }}" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                    <i class="material-icons f18">pageview</i>
+                  </a>
+                  <a href="/admin/editor/{{ .Id }}/" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" data-upgraded=",MaterialButton,MaterialRipple">
+                    <i class="material-icons f18">edit</i>
+                  </a>
+                  <a rel="{{ .Id }}" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect trash del">
+                    <i class="material-icons f18 mdl-color-text--red-400">delete</i>
+                  </a>
+                </div>
+                <div class="p-t-5">
+                  {{ range .Tags }}
+                  <span class="mdl-color--grey-200 radius3 inline p-5 f11 m-r-5">
+                    {{ .Name }}
+                  </span>
+                  {{ end }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{ end }}
+
+      </div>
+    </div>
+
+  </div>
+
+  <a href="/admin/editor/page" class="mdl-button mdl-button--fab mdl-button--primary mdl-js-button mdl-js-ripple-effect dingo-button--new">
+    <i class="material-icons">add</i>
+    <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+  </a>
+
+{{end}}

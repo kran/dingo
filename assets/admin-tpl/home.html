@@ -1,0 +1,67 @@
+{{ extends "/default.html" }}
+
+{{ define "body"}}
+<div class="content-grid mdl-grid">
+
+  <div class="dingo-card-list content-column mdl-cell mdl-cell--3-col mdl-cell--12-col-tablet mdl-cell--12-col-phone mdl-cell--top ">
+    <div class="mdl-layout mdl-card dingo-card-short mdl-shadow--2dp">
+      <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">Welcome</h2>
+      </div>
+      <div class="mdl-card__supporting-text">
+        <p>Welcome, <strong>{{.User.Name}}</strong>.</p>
+      </div>
+    </div>
+
+    <div class="mdl-layout mdl-card dingo-card-short dingo-card-count mdl-color--blue-400 mdl-color-text--white mdl-shadow--2dp">
+      <p class="mdl-color-text--white">Posts</p>
+      <h2 class="mdl-color-text--white">{{.Statis.Posts}}</h2>
+    </div>
+
+    <div class="mdl-layout mdl-card dingo-card-short dingo-card-count mdl-color--blue-300 mdl-color-text--white mdl-shadow--2dp">
+      <p class="mdl-color-text--white">Comments</p>
+      <h2 class="mdl-color-text--white">{{.Statis.Comments}}</h2>
+    </div>
+
+    <div class="mdl-layout mdl-card dingo-card-short dingo-card-count mdl-color--blue-300 mdl-color-text--white mdl-shadow--2dp">
+      <p class="mdl-color-text--white">Sessions</p>
+      <h2 class="mdl-color-text--white">{{.Statis.Sessions}}</h2>
+    </div>
+  </div>
+
+  <div class="content-column mdl-cell mdl-cell--4-col mdl-cell--10-col-tablet mdl-cell--12-col-phone mdl-cell--top ">
+
+    <div class="dingo-card-list">
+      <div class="mdl-layout mdl-card dingo-card-short dingo-card-msg mdl-shadow--2dp">
+        <div class="mdl-card__title">
+          <h2 class="mdl-card__title-text">Recent Activity</h2>
+        </div>
+        {{range .Messages}}
+        <div class="dingo-card-message-box">
+            <div class="dingo-msg {{.Type}}">
+              <time class="timeago dingo-msg-timestamp mdl-color-text--grey-400" datetime='{{DateFormat .CreatedAt "%Y-%m-%dT%H:%M:%S"}}'>{{DateFormat .CreatedAt "%b %d, %I:%M %p"}}</time>
+              <div class="data">{{Html .Data}}</div>
+            </div>
+          </div>
+        {{end}}
+
+        {{if lt (len .Messages) 1}}
+        <div class="mdl-card__supporting-text">
+          <p>No new messages.</p>
+        </div>
+        {{end}}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{{end}}
+
+{{ define "after_footer" }}
+<script type="text/javascript">
+  jQuery(document).ready(function() {
+    $("time.timeago").timeago();
+  });
+</script>
+{{end}}

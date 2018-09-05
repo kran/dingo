@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+    <title>{{ .Title }} - Dingo </title>
+    <link href="https://fonts.proxy.ustclug.org/icon?family=Material+Icons"
+          rel="stylesheet">
+    <link href="/admin/css/vendor.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="/admin/css/app.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="https://fonts.proxy.ustclug.org/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+  <body>
+
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header dingo-layout">
+
+      <header class="mdl-layout__header is-casting-shadow"><div aria-expanded="false" role="button" tabindex="0" class="mdl-layout__drawer-button"><i class="material-icons"></i></div>
+        <div class="mdl-layout__header-row">
+          <span class="mdl-layout-title">{{ .Title }}</span>
+
+          <div class="mdl-layout-spacer"></div>
+          <small class="mdl-layout-text mdl-layout--large-screen-only">Logged in as Admin</small>
+          <nav class="mdl-navigation mdl-layout--large-screen-only">
+            <a class="mdl-navigation__link" href="/logout"><i class="material-icons">exit_to_app</i></a>
+          </nav>
+
+        </div>
+      </header>
+
+      {{ include "sidebar.html" }}
+
+      <main class="mdl-layout__content dingo-page">
+      {{ template "body" }}
+      </main>
+
+      <div class="mdl-layout__obfuscator">
+      </div>
+    </div>
+
+    <script src="https://cdn.staticfile.org/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <script src="/admin/js/vendor.js"></script>
+    <script src="/admin/js/app.js"></script>
+    {{ template "after_footer"  }}
+  </body>
+</html>

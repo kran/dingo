@@ -1,0 +1,49 @@
+{{ extends "/default.html" }}
+
+{{ define "body"}}
+
+<div class="mdl-grid mdl-grid--no-spacing">
+  <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+    <div class="mdl-grid">
+
+      <div class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--2-col-phone">
+        <div class="mdl-card dingo-card dingo-card-short dingo-card-count mdl-shadow--2dp">
+          <p>Goroutine Count</p>
+          <h2>{{.Monitor.NumGoroutine}}</h2>
+        </div>
+      </div>
+
+      <div class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--2-col-phone">
+        <div class="mdl-card dingo-card dingo-card-short dingo-card-count mdl-shadow--2dp">
+          <p>HeapSys</p>
+          <h2>{{.Monitor.MemSys}}</h2>
+        </div>
+      </div>
+
+      <div class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--2-col-phone">
+        <div class="mdl-card dingo-card dingo-card-short dingo-card-count mdl-shadow--2dp">
+          <p>HeapAlloc</p>
+          <h2>{{.Monitor.MemHeap}}</h2>
+        </div>
+      </div>
+
+      <div class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--2-col-phone">
+        <div class="mdl-card dingo-card dingo-card-short dingo-card-count mdl-shadow--2dp">
+          <p>NextGC</p>
+          <h2>{{.Monitor.MemGc}}</h2>
+        </div>
+      </div>
+
+      <div class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--2-col-phone">
+        <div class="mdl-card dingo-card dingo-card-short dingo-card-count mdl-shadow--2dp">
+          <p>LastGC</p>
+          <h2>{{.Monitor.LastGcTime}}</h2>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{{ end }}
+

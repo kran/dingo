@@ -1,0 +1,136 @@
+{{ extends "/default.html" }}
+
+{{ define "body"}}
+
+<section class="text-fields">
+  <div class="mdl-color--light-blue ml-header relative clear">
+    <div class="p-20">
+      <h3 class="mdl-color-text--white m-t-20 m-b-5">Editor</h3>
+    </div>
+  </div>
+
+  <div class="mdl-grid mdl-grid--no-spacing">
+
+    <div class="mdl-cell mdl-cell--3-col mdl-cell--12-col-tablet mdl-cell--12-col-phone mdl-color--grey-100">
+      <div class="p-40 p-r-20 p-20--small">
+        <div class=" mdl-color-text--blue-grey-400">
+          <h3><i class="material-icons f-left m-r-5">info</i> Content information</h3>
+          <p id="post-information">Some relevant information should be displayed here</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mdl-cell mdl-cell--9-col mdl-cell--12-col-tablet mdl-cell--12-col-phone no-p-l">
+      <div class="p-20 ml-card-holder ml-card-holder-first">
+        <div class="mdl-card dingo-card mdl-shadow--1dp">
+
+          <div class="p-30">
+            <form id="post-form" action="#" method="post">
+
+              <div class="mdl-grid mdl-grid--no-spacing">
+                <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                    <input class="mdl-textfield__input" type="text" name="title" id="title" value="{{ .Post.Title }}">
+                    <label class="mdl-textfield__label" for="title">Title</label>
+                  </div>
+                </div>
+
+                <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                    <input class="mdl-textfield__input" type="text" name="slug" id="slug" value="{{ .Post.Slug }}">
+                    <label class="mdl-textfield__label" for="slug">Post Slug</label>
+                  </div>
+                </div>
+
+                <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                    <input class="mdl-textfield__input" type="text" name="image" id="image" value="{{ .Post.Image }}">
+                    <label class="mdl-textfield__label" for="image">Cover Image</label>
+                  </div>
+                </div>
+
+                <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+                  <textarea name="content" id="content" class="ipt">{{Html .Post.Markdown}}</textarea>
+                </div>
+
+                <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet mdl-cell--12-col-phone p-r-20">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                    <input class="mdl-textfield__input" type="text" name="category" id="category">
+                    <label class="mdl-textfield__label" for="slug">Category</label>
+                  </div>
+                </div>
+
+                <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                    <input class="mdl-textfield__input" type="text" name="tag" id="tag" value="{{ .Post.TagString }}">
+                    <label class="mdl-textfield__label" for="slug">Tags (Separate by commas)</label>
+                  </div>
+                </div>
+
+                <div class="mdl-cell mdl-cell--2-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+
+                  <button type="button" id="attach-show" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored mdl-color--blue">
+                    <i class="material-icons">attachment</i>
+                    <span class="mdl-button__ripple-container">
+                      <span class="mdl-ripple is-animating"></span>
+                    </span>
+                  </button>
+                </div>
+
+                <div class="mdl-cell mdl-cell--5-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+
+                  <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="comment">
+                    <input type="checkbox" id="comment" class="mdl-switch__input" name="comment" {{ if .Post.AllowComment }}checked{{ end }}/>
+                    <span class="mdl-switch__label">Allow Comment</span>
+                    <span class="mdl-ripple hide" /><!-- Workaround for js error -->
+                  </label>
+
+                </div>
+                <div class="mdl-cell mdl-cell--5-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+
+                  <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="status">
+                    <input type="checkbox" id="status" class="mdl-switch__input" name="status" {{ if .Post.IsPublished }}checked{{ end }}/>
+                    <span class="mdl-switch__label">Publish</span>
+                    <span class="mdl-ripple hide" /><!-- Workaround for js error -->
+                  </label>
+
+                </div>
+
+<div class="m-t-20">
+
+                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green mdl-js-ripple-effect">
+                  Save
+                </button>
+
+              </div>
+
+
+
+              </div>
+            </form>
+
+            <form class="form hide" id="attach-form" action="/admin/files/upload/" enctype="multipart/form-data" method="post">
+              <input id="attach-upload" type="file" name="file"/>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</section>
+
+{{end}}
+
+{{ define "after_footer" }}
+
+<script>
+  var simplemde = new SimpleMDE({
+    element: $("#content")[0],
+    renderingConfig: {
+      codeSyntaxHighlighting: true
+    }
+  });
+</script>
+{{ end }}

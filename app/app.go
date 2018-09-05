@@ -8,6 +8,7 @@ import (
 	"github.com/dinever/golf"
 	"github.com/dingoblog/dingo/app/handler"
 	"github.com/dingoblog/dingo/app/model"
+	//"github.com/dingoblog/dingo/app/assets"
 )
 
 func fileExists(filename string) bool {

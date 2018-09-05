@@ -1,0 +1,31 @@
+<div id="sidebar">
+
+  <div class="widget widget-bordered" id="widget-latest">
+    <h4 class="widget-title">Latest post</h4>
+    <ul class="widget-list">
+      {{ range RecentPosts }}
+      <li><a title="{{ .Title }}" href="{{ .Url }}/">{{ .Title }}</a></li>
+      {{ end }}
+      </ul>
+  </div>
+
+  <div class="widget widget-bordered" id="widget-tags">
+    <h4 class="widget-title">Tags</h4>
+    <div class="widget-content">
+      <div class="tagcloud">
+        {{ range Tags }}
+        <a class="button tag" href="/tag/{{ .Slug }}/">{{ .Name }}</a>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+
+  <div class="widget widget-bordered" id="widget-comments">
+    <h4 class="widget-title">Recent Comments</h4>
+    <ul class="widget-list">
+      {{ range RecentComments }}
+      <li><a href="{{ .Post.Url }}#comment-{{.Id}}">{{ .Author }} on {{ .Post.Title }}</a></li>
+      {{ end }}
+    </ul>
+  </div>
+</div>

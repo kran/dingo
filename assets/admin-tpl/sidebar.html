@@ -1,0 +1,70 @@
+<div class="mdl-layout__drawer" aria-hidden="true">
+  <div class="dingo-layout__sidebar">
+    <div class="sidebar-header">
+
+      <div class="profile m-t-10">
+        <div class="f-left m-l-30 m-r-10">
+          <img src="{{ .User.Avatar }}" class="avatar img-responsive radiushalf">
+        </div>
+        <div class="f-left m-t-5">
+          <p class="m-t-5 no-m-b">{{ .User.Name }}</p>
+        </div>
+      </div>
+
+    </div>
+    <div class="sidebar-body">
+      <div class="dingo-menu-container">
+
+        <ul class="dingo-menu">
+
+          <li class='{{if eq .Title "Dashboard"}}active{{end}}'>
+            <a class="mdl-navigation__link" href="/admin/"><span class="mdl-color-text--black--400 material-icons" role="presentation">dashboard</span>Dashboard</a>
+          </li>
+
+          <li class="has-menu is-expanded">
+            <a href="#"><span class="mdl-color-text--black--400 material-icons" role="presentation">storage</span>Content</a>
+
+            <ul class="dingo-menu collapse in">
+
+              <li>
+                <a href="/admin/posts/">Posts</a>
+              </li>
+
+              <li>
+                <a href="/admin/pages/">Pages</a>
+              </li>
+
+            </ul>
+
+          </li>
+
+          <li class='{{if eq .Title "Comments"}}active{{end}}'>
+            <a class="mdl-navigation__link" href="/admin/comments/"><span class="mdl-color-text--black--400 material-icons" role="presentation">comment</span>Comments</a>
+          </li>
+
+          <li class='{{if eq .Title "Profile"}}active{{end}}'>
+            <a class="mdl-navigation__link" href="/admin/profile/"><span class="mdl-color-text--black--400 material-icons" role="presentation">account_box</span>Profile</a>
+          </li>
+
+          <li class='{{if eq .Title "Files"}}active{{end}}'>
+            <a class="mdl-navigation__link" href="/admin/files/"><span class="mdl-color-text--black--400 material-icons" role="presentation">attachment</span>Files</a>
+          </li>
+
+          <li class='{{if eq .Title "Settings"}}active{{end}}'>
+            <a class="mdl-navigation__link" href="/admin/setting/"><span class="mdl-color-text--black--400 material-icons" role="presentation">settings</span>Settings</a>
+          </li>
+
+          <li class='{{if eq .Title "Monitor"}}active{{end}}'>
+            <a class="mdl-navigation__link" href="/admin/monitor/"><span class="mdl-color-text--black--400 material-icons" role="presentation">assessment</span>Monitor</a>
+          </li>
+
+        </ul>
+
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      Powered by <a href="http://github.com/dingoblog/dingo" target="_blank">Dingo</a>
+    </div>
+  </div>
+
+</div>

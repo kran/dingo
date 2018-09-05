@@ -2,11 +2,12 @@ package handler
 
 import (
 	"os"
-	"path/filepath"
+	// "path/filepath"
 
 	"github.com/dinever/golf"
 	"github.com/dingoblog/dingo/app/model"
 	"github.com/dingoblog/dingo/app/utils"
+	"github.com/dingoblog/dingo/app/assets"
 )
 
 func Initialize(app *golf.Application) *golf.Application {
@@ -18,13 +19,22 @@ func Initialize(app *golf.Application) *golf.Application {
 	registerFuncMap(app)
 	RegisterFunctions(app)
 	theme := model.GetSettingValue("theme")
-	app.View.SetTemplateLoader("base", "view")
-	app.View.SetTemplateLoader("admin", filepath.Join("view", "admin"))
-	app.View.SetTemplateLoader("theme", filepath.Join("view", theme))
+	// app.View.SetTemplateLoader("base", "view")
+	// app.View.SetTemplateLoader("admin", filepath.Join("view", "admin"))
+	// app.View.SetTemplateLoader("theme", filepath.Join("view", theme))
+    app.View.SetTemplateLoaderEx("base", &assets.VfsMapLoader{
+        BaseDir: "/",
+    });
+    app.View.SetTemplateLoaderEx("admin", &assets.VfsMapLoader{
+        BaseDir: "/admin-tpl",
+    });
+	app.View.SetTemplateLoaderEx("theme", &assets.VfsMapLoader{
+        BaseDir: "/" + theme,
+    })
 	//      static_dir, _ := app.Config.GetString("app/static_dir", "static")
 	app.Static("/upload/", upload_dir)
-	app.Static("/admin/", filepath.Join("view", "admin", "assets", "dist"))
-	app.Static("/", filepath.Join("view", theme, "assets", "dist"))
+	// app.Static("/admin/", filepath.Join("view", "admin", "assets", "dist"))
+	// app.Static("/", filepath.Join("view", theme, "assets", "dist"))
 
 	app.SessionManager = golf.NewMemorySessionManager()
 	app.Error(404, NotFoundHandler)
@@ -50,6 +60,7 @@ func registerMiddlewares(app *golf.Application) {
 	app.Use(
 		golf.LoggingMiddleware(os.Stdout),
 		golf.RecoverMiddleware,
+        assets.VfsMiddleware,
 		golf.SessionMiddleware,
 	)
 }

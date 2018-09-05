@@ -1,0 +1,277 @@
+{{ extends "/default.html" }}
+
+{{ define "body"}}
+<section class="advanced-elements">
+  <div class="mdl-color--blue ml-header relative clear">
+    <div class="p-50"></div>
+  </div>
+
+  <div class="mdl-grid mdl-grid--no-spacing">
+
+    <div class="mdl-cell mdl-cell--9-col mdl-cell--12-col-tablet mdl-cell--12-col-phone no-p-l">
+      <div class="p-20 ml-card-holder ml-card-holder-first">
+        <div class="mdl-card mdl-shadow--1dp fullwidth">
+          <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">General</h2>
+          </div>
+          <div class="p-15 p-20--small">
+
+            <form class="setting-form" action="/admin/setting/" method="POST">
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="url" id="site_url" name="site_url" value="{{ Setting `site_url` }}">
+                <label class="mdl-textfield__label" for="site_url">Site URL</label>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" id="title" name="title" value="{{ Setting `title` }}">
+                <label class="mdl-textfield__label" for="title">Title</label>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" id="subtitle" name="subtitle" value="{{ Setting `subtitle` }}">
+                <label class="mdl-textfield__label" for="subtitle">Subtitle</label>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" id="meta_keywords" name="meta_keywords" value="{{ Setting `meta_keywords` }}">
+                <label class="mdl-textfield__label" for="meta_keywords">Meta Keywords</label>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" id="meta_description" name="meta_description" value="{{ Setting `meta_description` }}">
+                <label class="mdl-textfield__label" for="meta_description">Meta Description</label>
+              </div>
+
+              <div class="m-t-20">
+                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--blue-500 mdl-js-ripple-effect">
+                  Save
+                  <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="mdl-grid mdl-grid--no-spacing">
+
+    <div class="mdl-cell mdl-cell--9-col mdl-cell--12-col-tablet mdl-cell--12-col-phone no-p-l">
+      <div class="p-20 ml-card-holder">
+        <div class="mdl-card mdl-shadow--1dp fullwidth">
+          <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Content</h2>
+          </div>
+          <div class="p-15 p-20--small">
+
+            <form class="setting-form" action="/admin/setting/" method="POST">
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="post_per_page" name="post_per_page" value="{{ Setting `post_per_page` }}">
+                <label class="mdl-textfield__label" for="post_per_page">Post per Page</label>
+                <span class="mdl-textfield__error">Please input a number</span>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="popular_posts_num" name="popular_posts_num" value="{{ Setting `popular_posts_num` }}">
+                <label class="mdl-textfield__label" for="popular_posts_num">Number of Popular Posts</label>
+                <span class="mdl-textfield__error">Please input a number</span>
+              </div>
+
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="recent_comments_num" name="recent_comments_num" value="{{ Setting `popular_posts_num` }}">
+                <label class="mdl-textfield__label" for="recent_comments_num">Number of Recent Comments</label>
+                <span class="mdl-textfield__error">Please input a number</span>
+              </div>
+
+              <div class="m-t-20">
+                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--blue-500 mdl-js-ripple-effect">
+                  Save
+                  <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="mdl-grid mdl-grid--no-spacing">
+
+    <div class="mdl-cell mdl-cell--9-col mdl-cell--12-col-tablet mdl-cell--12-col-phone no-p-l">
+      <div class="p-20 ml-card-holder">
+        <div class="mdl-card mdl-shadow--1dp fullwidth">
+          <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Navigation</h2>
+          </div>
+          <div class="p-15 p-20--small">
+
+            <form id="setting-nav-form" class="setting-form form form-align setting-panel" action="/admin/setting/nav/" method="post">
+              <div id="navigators">
+              <div class="mdl-grid mdl-grid--no-spacing">
+                {{range .Navigators}}
+                <div class="mdl-grid mdl-grid--no-spacing fullwidth">
+                  <div class="mdl-cell mdl-cell--5-col mdl-cell--5-col-tablet mdl-cell--5-col-phone p-r-25">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                      <input class="mdl-textfield__input" type="text" name="label" value="{{.Label}}">
+                      <label class="mdl-textfield__label" for="label">Label</label>
+                    </div>
+                  </div>
+
+                  <div class="mdl-cell mdl-cell--5-col mdl-cell--5-col-tablet mdl-cell--5-col-phone p-r-25">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                      <input class="mdl-textfield__input" type="text" name="url" value="{{.Url}}">
+                      <label class="mdl-textfield__label" for="url">URL</label>
+                    </div>
+                  </div>
+
+                  <div class="mdl-cell mdl-cell--2-col mdl-cell--2-col-tablet mdl-cell--2-col-phone">
+                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--red-400 mdl-js-ripple-effect del-nav" href="#">Delete</a>
+                  </div>
+                </div>
+                {{end}}
+              </div>
+              </div>
+
+              <div class="m-t-20">
+                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--blue-500 mdl-js-ripple-effect">
+                  Save
+                  <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+                </button>
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green-500 mdl-js-ripple-effect" id="add-nav" rel="#nav-item">
+                  Add
+                  <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+                </a>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="mdl-grid mdl-grid--no-spacing">
+
+    <div class="mdl-cell mdl-cell--9-col mdl-cell--12-col-tablet mdl-cell--12-col-phone no-p-l">
+      <div class="p-20 ml-card-holder">
+        <div class="mdl-card mdl-shadow--1dp fullwidth">
+          <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Custom</h2>
+          </div>
+          <div class="p-15 p-20--small">
+
+            <form id="setting-custom-form" class="setting-form form form-align setting-panel" action="/admin/setting/custom/" method="post">
+              <div id="custom-settings" class="mdl-grid mdl-grid--no-spacing">
+                {{range .Custom}}
+                <div class="mdl-grid mdl-grid--no-spacing fullwidth">
+                  <div class="mdl-cell mdl-cell--5-col mdl-cell--5-col-tablet mdl-cell--5-col-phone p-r-25">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                      <input class="mdl-textfield__input" type="text" name="key" value="{{ .Key }}">
+                      <label class="mdl-textfield__label" for="key">Key</label>
+                    </div>
+                  </div>
+
+                  <div class="mdl-cell mdl-cell--5-col mdl-cell--5-col-tablet mdl-cell--5-col-phone p-r-25">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+                      <input class="mdl-textfield__input" type="text" name="value" value="{{ .Value }}">
+                      <label class="mdl-textfield__label" for="value">Value</label>
+                    </div>
+                  </div>
+
+                  <div class="mdl-cell mdl-cell--2-col mdl-cell--2-col-tablet mdl-cell--2-col-phone">
+                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--red-400 mdl-js-ripple-effect del-custom" href="#">Delete</a>
+                  </div>
+                </div>
+
+                {{end}}
+              </div>
+
+              <div class="m-t-20">
+                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--blue-500 mdl-js-ripple-effect">
+                  Save
+                  <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+                </button>
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green-500 mdl-js-ripple-effect" id="add-custom" rel="#custom-item">
+                  Add
+                  <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+                </a>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</section>
+
+<script type="text/template" id="nav-item">
+
+    <div class="mdl-grid mdl-grid--no-spacing fullwidth">
+    <div class="mdl-cell mdl-cell--5-col mdl-cell--5-col-tablet mdl-cell--5-col-phone p-r-25">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+        <input class="mdl-textfield__input" type="text" id="label" name="label" value="">
+        <label class="mdl-textfield__label" for="label">Label</label>
+      </div>
+    </div>
+
+    <div class="mdl-cell mdl-cell--5-col mdl-cell--5-col-tablet mdl-cell--5-col-phone p-r-25">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+        <input class="mdl-textfield__input" type="text" id="url" name="url" value="">
+        <label class="mdl-textfield__label" for="url">URL</label>
+      </div>
+    </div>
+
+    <div class="mdl-cell mdl-cell--2-col mdl-cell--2-col-tablet mdl-cell--2-col-phone">
+      <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--red-400 mdl-js-ripple-effect del-nav" href="#">Delete</a>
+    </div>
+  </div>
+
+</script>
+
+<script type="text/template" id="custom-item">
+
+  <div class="mdl-grid mdl-grid--no-spacing fullwidth">
+    <div class="mdl-cell mdl-cell--5-col mdl-cell--5-col-tablet mdl-cell--5-col-phone p-r-25">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+        <input class="mdl-textfield__input" type="text" id="key" name="key" value="">
+        <label class="mdl-textfield__label" for="key">Label</label>
+      </div>
+    </div>
+
+    <div class="mdl-cell mdl-cell--5-col mdl-cell--5-col-tablet mdl-cell--5-col-phone p-r-25">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label fullwidth">
+        <input class="mdl-textfield__input" type="text" id="value" name="value" value="">
+        <label class="mdl-textfield__label" for="value">Value</label>
+      </div>
+    </div>
+
+    <div class="mdl-cell mdl-cell--2-col mdl-cell--2-col-tablet mdl-cell--2-col-phone">
+      <a class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--red-400 mdl-js-ripple-effect del-custom" href="#">Delete</a>
+    </div>
+  </div>
+
+</script>
+
+{{end}}
+
+
+{{ define "after_footer" }}
+<script>
+
+</script>
+{{ end }}

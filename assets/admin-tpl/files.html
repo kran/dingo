@@ -1,0 +1,90 @@
+{{ extends "/default.html" }}
+
+{{ define "body"}}
+
+<section class="tables-data">
+  <div class="mdl-color--blue-grey ml-header relative clear">
+    <div class="p-50">
+    </div>
+  </div>
+
+  <div class="mdl-grid mdl-grid--no-spacing">
+
+    <div class="mdl-cell mdl-cell--12-col  mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+      <div class="p-20 ml-card-holder ml-card-holder-first">
+
+        <div class="mdl-card dingo-card mdl-shadow--1dp m-b-30">
+          <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Files</h2>
+          </div>
+
+          {{ if .IsChildDir }}
+          <div class="m-10">
+            <a href="/admin/files/?dir={{.ParentDir}}" type="reset" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color--blue mdl-color-text--white">
+              Back
+              <span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
+            </a>
+          </div>
+          {{ end }}
+
+
+          <table class="table mdl-data-table fullwidth" id="files_table">
+            <thead>
+              <tr>
+                <th class="mdl-data-table__cell--non-numeric">Upload Time</th>
+                <th class="mdl-data-table__cell--non-numeric">File Size</th>
+                <th class="mdl-data-table__cell--non-numeric">File Name</th>
+                <th class="mdl-data-table__cell--non-numeric">Type</th>
+                <th class="mdl-data-table__cell--non-numeric">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range .Files}}
+              <tr id="file-{{.Name}}">
+                <td class="mdl-data-table__cell--non-numeric">
+                  {{DateFormat .ModTime "%Y-%m-%d %H:%M"}}
+                </td>
+                <td class="mdl-data-table__cell--non-numeric">
+                  {{FileSize .Size}}
+                </td>
+                <td class="mdl-data-table__cell--non-numeric">
+                  {{.Name}}
+                </td>
+                <td class="mdl-data-table__cell--non-numeric">
+                  {{ if .IsDir }}
+                  Directory
+                  {{ else }}
+                  File
+                  {{ end }}
+                </td>
+                <td class="mdl-data-table__cell--non-numeric">
+                  {{ if .IsDir }}
+                  <a class="btn btn-small blue" href="/admin/files/?dir={{.Url}}" title="/{{.Name}}">View</a>
+                  {{ else }}
+                  <a class="btn btn-small blue" href="/{{.Url}}" target="_blank" title="/{{.Name}}">View</a>
+                  {{ end }}
+                  <a class="btn btn-small red delete-file" href="#" name="{{.Name}}" rel="{{.Url}}" title="Delete">Delete</a>
+                </td>
+              </tr>
+              {{end}}</tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<button id="attach-show" class="mdl-button mdl-button--fab mdl-button--primary mdl-js-button mdl-js-ripple-effect dingo-button--new mdl-color--red">
+  <i class="material-icons">cloud_upload</i>
+  <span class="mdl-button__ripple-container"><span class="mdl-ripple is-animating"></span></span>
+</button>
+
+<form class="form hide" id="attach-form" action="/admin/files/upload/" enctype="multipart/form-data" method="post">
+    <input id="attach-upload" type="file" name="file"/>
+</form>
+
+{{end}}
+
