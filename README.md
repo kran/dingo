@@ -1,3 +1,7 @@
+**Notice:** this fork of dingo embeded all static files into binary, include template files, because of the break changes, so won't be push to original reporsity.
+
+----
+
 **This project is under heavy development and is not ready for use. However, we'd love to have your contribution.**
 
 ![Dingo Logo](https://cloud.githubusercontent.com/assets/1311594/15427334/652081ae-1e62-11e6-9ae3-1dd0a667f22d.png)
